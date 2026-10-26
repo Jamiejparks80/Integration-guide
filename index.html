@@ -1,0 +1,783 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="How to integrate with the Muuvo partner API: onboarding, tenancy timings, the British Gas void service and go-live.">
+<title>Muuvo Partner API Guide</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: Muuvo report style. Navy gradient hero with a key-timings stat row, then
+   white bordered cards in one reading column beside a sticky contents rail.
+   Deliberately light-only, matching Muuvo's printed reports. */
+:root {
+  --page: #f5f8fb;
+  --surface: #ffffff;
+  --navy: #1d3d5c;
+  --ink: #2d3f50;
+  --muted: #6d7e8e;
+  --line: #dfe6ed;
+  --blue: #2e6a96;
+  --blue-soft: #eaf2f8;
+  --teal: #7db6c8;
+  --green: #17a07a;
+  --green-soft: #e9f6f1;
+  --amber: #df8a1d;
+  --amber-ink: #a8620c;
+  --amber-soft: #fdf3e5;
+  --red: #d9534f;
+  --sky: #8fd3ee;
+  /* aliases used by the markup */
+  --accent: var(--blue);
+  --accent-soft: var(--blue-soft);
+  --code-bg: #16314b;
+  --code-fg: #dce8f1;
+  --code-key: #8fc6d6;
+  --code-str: #f3c07c;
+  --font: "Poppins", "Segoe UI", system-ui, sans-serif;
+  --mono: "JetBrains Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+  color-scheme: light;
+}
+
+* { box-sizing: border-box; }
+body { background: var(--page); color: var(--ink); font-family: var(--font); font-size: 15px; line-height: 1.65; }
+a { color: var(--blue); text-underline-offset: 3px; }
+a:focus-visible, button:focus-visible { outline: 2px solid var(--blue); outline-offset: 2px; border-radius: 4px; }
+code { font-family: var(--mono); font-size: 0.84em; background: var(--blue-soft); color: var(--navy); padding: 0.1em 0.35em; border-radius: 4px; overflow-wrap: anywhere; }
+b, strong { color: var(--navy); font-weight: 600; }
+
+.wrap {
+  max-width: 1180px; margin: 0 auto;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+
+/* Hero */
+.hero-band { padding-block: 28px 0; }
+.hero {
+  position: relative; overflow: hidden; border-radius: 16px; color: #fff;
+  background: linear-gradient(120deg, #1b3a58 0%, #26567d 55%, #3b84b6 100%);
+  padding: 34px clamp(20px, 4vw, 40px) 30px; display: grid; gap: 14px;
+}
+.hero::after {
+  content: ""; position: absolute; width: 420px; height: 420px; right: -110px; top: -150px;
+  border-radius: 50%; background: rgba(255,255,255,0.06); pointer-events: none;
+}
+.brand img { display: block; height: 30px; width: auto; }
+.dot { display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: var(--teal); vertical-align: middle; margin: 0 8px; }
+.eyebrow { font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.16em; font-weight: 600; color: rgba(255,255,255,0.78); }
+h1 .sky { color: var(--sky); }
+h1 { font-weight: 700; font-size: clamp(1.9rem, 4.4vw, 2.7rem); line-height: 1.12; letter-spacing: -0.015em; margin: 0; text-wrap: balance; max-width: 22ch; color: #fff; }
+.lede { font-size: 0.98rem; color: rgba(255,255,255,0.86); max-width: 64ch; margin: 0; }
+.stats { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 18px; margin-top: 10px; position: relative; z-index: 1; }
+.stat b { display: block; color: #fff; font-size: clamp(1.6rem, 3vw, 2.1rem); font-weight: 700; line-height: 1.1; letter-spacing: -0.01em; }
+.stat span { display: block; font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.14em; font-weight: 600; margin-top: 6px; color: #fff; }
+.stat small { display: block; font-size: 0.78rem; color: rgba(255,255,255,0.72); line-height: 1.4; margin-top: 2px; }
+.meta span + span::before { content: ""; display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: var(--teal); vertical-align: middle; margin-right: 14px; }
+.meta { display: flex; flex-wrap: wrap; gap: 6px 14px; font-size: 0.8rem; color: var(--muted); padding: 14px 4px 0; }
+.meta b { color: var(--navy); }
+
+/* Body grid */
+.layout { display: grid; grid-template-columns: 220px minmax(0, 1fr); gap: 32px; padding-block: 28px 64px; }
+nav.toc { position: sticky; top: calc(env(safe-area-inset-top, 0px) + 20px); align-self: start; font-size: 0.84rem; }
+nav.toc p { margin: 0 0 10px; }
+nav.toc ol { list-style: none; margin: 0; padding: 0; display: grid; gap: 2px; }
+nav.toc a { display: block; padding: 6px 10px; border-radius: 8px; color: var(--muted); text-decoration: none; border-left: 3px solid transparent; }
+nav.toc a:hover { color: var(--navy); background: var(--surface); }
+nav.toc a.active { color: var(--navy); border-left-color: var(--blue); background: var(--surface); font-weight: 600; }
+
+main { min-width: 0; display: grid; gap: 18px; }
+section {
+  scroll-margin-top: 20px; display: grid; gap: 14px; min-width: 0;
+  background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 24px clamp(18px, 3vw, 28px) 26px;
+}
+section > p, section > ul, section > ol { max-width: 70ch; margin: 0; }
+.sec-head { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; flex-wrap: wrap; border-bottom: 2px solid var(--navy); padding-bottom: 8px; }
+h2 { font-weight: 700; font-size: 1.35rem; color: var(--navy); letter-spacing: -0.01em; line-height: 1.2; margin: 0; text-wrap: balance; }
+h3 { font-weight: 600; font-size: 1.02rem; color: var(--navy); margin: 6px 0 0; }
+.sec-label { font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.16em; font-weight: 600; color: var(--teal); }
+ul, ol { padding-left: 1.2em; }
+li + li { margin-top: 6px; }
+
+/* Callouts, as in the reports */
+.note { border-left: 4px solid var(--blue); background: var(--blue-soft); border-radius: 0 10px 10px 0; padding: 12px 16px; max-width: 70ch; display: grid; gap: 2px; }
+.note.teal { border-left-color: var(--green); background: var(--green-soft); }
+.note.amber { border-left-color: var(--amber); background: var(--amber-soft); }
+.note strong:first-child { font-weight: 700; }
+.note p { margin: 0; }
+
+/* Timeline */
+.timeline { list-style: none; margin: 0; padding: 0; position: relative; display: grid; max-width: 760px; }
+.timeline::before { content: ""; position: absolute; left: 118px; top: 8px; bottom: 8px; width: 2px; background: var(--navy); opacity: .85; }
+.timeline li { display: grid; grid-template-columns: 100px 36px minmax(0, 1fr); align-items: start; padding-block: 10px; margin: 0; }
+.t-when { font-size: 0.76rem; font-weight: 600; color: var(--navy); text-align: right; padding-top: 2px; }
+.t-dot { width: 15px; height: 15px; border-radius: 50%; background: var(--surface); border: 3px solid var(--navy); margin: 4px auto 0; position: relative; z-index: 1; }
+.t-dot.solid { border-color: var(--green); }
+.t-dot.amber { border-color: var(--amber); }
+.t-what { display: grid; gap: 1px; min-width: 0; }
+.t-what span { color: var(--muted); font-size: 0.9rem; }
+
+/* Tables, as in the reports */
+.table-scroll { overflow-x: auto; }
+table { border-collapse: collapse; width: 100%; font-size: 0.88rem; }
+th, td { text-align: left; padding: 10px 12px 10px 0; border-bottom: 1px solid var(--line); vertical-align: top; }
+th { font-size: 0.66rem; text-transform: uppercase; letter-spacing: 0.12em; color: var(--muted); font-weight: 600; }
+td code { white-space: nowrap; }
+.method { font-family: var(--mono); font-size: 0.7rem; font-weight: 500; padding: 2px 8px; border-radius: 5px; white-space: nowrap; }
+.m-get { background: var(--green-soft); color: var(--green); }
+.m-post { background: var(--amber-soft); color: var(--amber-ink); }
+.m-put { background: var(--blue-soft); color: var(--blue); }
+.m-del { background: #fbeceb; color: var(--red); }
+
+/* Steps: numbered navy discs, as in "Working together" */
+.steps { list-style: none; padding: 0; margin: 0; display: grid; gap: 12px; counter-reset: step; max-width: 760px; }
+.steps li { counter-increment: step; display: grid; grid-template-columns: 26px minmax(0, 1fr); gap: 12px; align-items: start; margin: 0; }
+.steps li::before { content: counter(step); font-weight: 700; width: 24px; height: 24px; border-radius: 50%; background: var(--navy); color: #fff; display: grid; place-items: center; font-size: 0.75rem; margin-top: 2px; }
+.steps li div { min-width: 0; }
+.steps b { display: inline; }
+.steps span { color: var(--ink); font-size: 0.92rem; }
+.steps b::after { content: ". "; }
+
+/* Field cards */
+.fields { display: grid; grid-template-columns: repeat(auto-fit, minmax(290px, 1fr)); gap: 14px; }
+.field { border: 1px solid var(--line); border-top: 4px solid var(--blue); border-radius: 12px; padding: 14px 16px; display: grid; gap: 8px; align-content: start; min-width: 0; }
+.field h4 { margin: 0; font-family: var(--mono); font-size: 0.84rem; font-weight: 500; color: var(--navy); overflow-wrap: anywhere; }
+.field p { margin: 0; font-size: 0.9rem; }
+.field .vals { display: grid; gap: 6px; font-size: 0.87rem; }
+.field .vals div { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 10px; align-items: baseline; }
+.pill { font-size: 0.66rem; font-weight: 700; letter-spacing: 0.06em; padding: 2px 8px; border-radius: 5px; background: var(--green-soft); color: var(--green); white-space: nowrap; font-family: var(--mono); }
+.pill.amber { background: var(--amber-soft); color: var(--amber-ink); }
+.rec { font-size: 0.66rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--green); background: var(--green-soft); padding: 1px 7px; border-radius: 5px; margin-left: 4px; }
+
+/* Code */
+.code { background: var(--code-bg); color: var(--code-fg); border-radius: 12px; min-width: 0; }
+.code-head { display: flex; justify-content: space-between; align-items: center; padding: 8px 14px; border-bottom: 1px solid rgba(255,255,255,0.1); font-size: 0.74rem; color: var(--code-key); font-family: var(--mono); gap: 10px; }
+.code-head button { font-family: var(--font); font-size: 0.74rem; font-weight: 600; background: transparent; color: var(--code-fg); border: 1px solid rgba(255,255,255,0.25); border-radius: 6px; padding: 3px 10px; cursor: pointer; }
+.code-head button:hover { border-color: var(--code-key); }
+.code pre { margin: 0; padding: 14px 16px; overflow-x: auto; font-family: var(--mono); font-size: 0.8rem; line-height: 1.6; }
+.code .k { color: var(--code-key); }
+.code .s { color: var(--code-str); }
+
+/* Void window, in the report's target-window style */
+.void-bar { display: grid; grid-template-columns: 5fr 1.2fr 30fr; gap: 4px; max-width: 760px; font-size: 0.8rem; }
+.void-bar div { padding: 10px 12px; border-radius: 8px; min-width: 0; }
+.vb-1 { background: var(--amber-soft); color: var(--amber-ink); }
+.vb-2 { background: var(--navy); color: #fff; text-align: center; font-weight: 600; }
+.vb-3 { background: var(--green-soft); color: var(--green); }
+.void-bar b { display: block; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.1em; color: inherit; }
+
+/* Checklist */
+.check { list-style: none; padding: 0; margin: 0; display: grid; gap: 8px; max-width: 70ch; }
+.check li { display: grid; grid-template-columns: 22px minmax(0, 1fr); gap: 10px; margin: 0; }
+.check li::before { content: "✓"; width: 18px; height: 18px; border-radius: 50%; background: var(--green); color: #fff; font-size: 0.7rem; font-weight: 700; display: grid; place-items: center; margin-top: 3px; }
+
+footer { color: var(--muted); font-size: 0.78rem; }
+footer .wrap { padding-block: 22px 32px; border-top: 1px solid var(--line); display: flex; flex-wrap: wrap; justify-content: space-between; align-items: flex-end; gap: 18px 32px; }
+.sign { display: grid; gap: 6px; }
+.sign .tag { font-size: 1.35rem; font-weight: 700; color: var(--navy); letter-spacing: -0.01em; line-height: 1.15; }
+.sign .services { font-size: 0.88rem; color: var(--navy); font-weight: 500; }
+.sign .services .dot { margin: 0 6px; }
+.sign .web { color: var(--navy); font-weight: 600; }
+.foot-right { display: grid; gap: 8px; justify-items: end; text-align: right; }
+.foot-right img { height: 30px; width: auto; display: block; }
+@media (max-width: 560px) { .foot-right { justify-items: start; text-align: left; } }
+
+
+/* Search */
+.search { display: grid; gap: 6px; margin-bottom: 18px; }
+.search input, .tool-form input, .tool-form select {
+  font: inherit; font-size: 0.88rem; color: var(--navy); background: var(--surface);
+  border: 1px solid var(--line); border-radius: 8px; padding: 8px 10px; width: 100%; min-width: 0;
+}
+.search input:focus, .tool-form input:focus, .tool-form select:focus { outline: 2px solid var(--blue); outline-offset: 1px; border-color: var(--blue); }
+mark { background: #fff0c2; color: inherit; border-radius: 2px; }
+.no-results { background: var(--surface); border: 1px dashed var(--line); border-radius: 14px; padding: 18px 22px; margin: 0; }
+
+/* Tools */
+.tool { display: grid; grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr); gap: 22px; align-items: start; }
+.tool-form { display: grid; gap: 12px; background: var(--page); border: 1px solid var(--line); border-radius: 12px; padding: 16px; min-width: 0; }
+.tool-form label { display: grid; gap: 5px; font-size: 0.8rem; font-weight: 600; color: var(--navy); min-width: 0; }
+.tool-form label small { font-weight: 400; color: var(--muted); }
+.tool-form .row2 { display: grid; grid-template-columns: minmax(0, 0.75fr) minmax(0, 1.25fr); gap: 12px; }
+.tool-form fieldset { border: 0; padding: 0; margin: 0; display: grid; gap: 6px; }
+.tool-form legend { font-size: 0.66rem; text-transform: uppercase; letter-spacing: 0.14em; font-weight: 600; color: var(--muted); margin-bottom: 4px; }
+.tool-form label.tick { display: flex; align-items: center; gap: 8px; font-weight: 500; font-size: 0.88rem; cursor: pointer; }
+.tool-form label.tick input { width: 16px; height: 16px; accent-color: var(--blue); padding: 0; flex: none; }
+.tool-out { display: grid; gap: 14px; min-width: 0; }
+.summary { display: grid; gap: 6px; font-size: 0.88rem; }
+.summary div { display: grid; grid-template-columns: 18px minmax(0, 1fr); gap: 8px; }
+.summary i { width: 10px; height: 10px; border-radius: 50%; margin-top: 7px; background: var(--green); }
+.summary i.off { background: var(--amber); }
+
+/* Planner output */
+.plan { list-style: none; margin: 0; padding: 0; display: grid; border: 1px solid var(--line); border-radius: 12px; overflow: hidden; }
+.plan li { display: grid; grid-template-columns: 128px minmax(0, 1fr); gap: 14px; padding: 10px 14px; border-bottom: 1px solid var(--line); margin: 0; }
+.plan li:last-child { border-bottom: 0; }
+.plan .when { font-size: 0.8rem; font-weight: 600; color: var(--navy); font-variant-numeric: tabular-nums; }
+.plan .when small { display: block; font-weight: 500; color: var(--muted); font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.08em; }
+.plan .what { font-size: 0.88rem; min-width: 0; }
+.plan .what b { display: block; }
+.plan li.api { background: var(--blue-soft); }
+.plan li.void { background: var(--amber-soft); }
+#tp-flags { display: grid; gap: 8px; }
+
+/* Endpoints */
+.ep-list { display: grid; border: 1px solid var(--line); border-radius: 12px; overflow: hidden; }
+.ep { border-bottom: 1px solid var(--line); }
+.ep:last-child { border-bottom: 0; }
+.ep summary { list-style: none; cursor: pointer; display: grid; grid-template-columns: 64px minmax(0, auto) minmax(0, 1fr) 16px; gap: 12px; align-items: center; padding: 11px 14px; font-size: 0.88rem; }
+.ep summary::-webkit-details-marker { display: none; }
+.ep summary:hover { background: var(--page); }
+.ep summary:focus-visible { outline: 2px solid var(--blue); outline-offset: -2px; }
+.ep summary .method { justify-self: start; }
+.ep summary code { white-space: nowrap; }
+.ep summary .ep-desc { color: var(--muted); }
+.ep summary::after { content: "+"; font-weight: 700; color: var(--blue); text-align: center; }
+.ep[open] summary::after { content: "−"; }
+.ep[open] summary { background: var(--page); }
+.ep-body { padding: 4px 16px 18px; display: grid; gap: 10px; }
+.ep-body p { margin: 0; font-size: 0.9rem; max-width: 70ch; }
+.ep-body h5 { margin: 6px 0 0; font-size: 0.66rem; text-transform: uppercase; letter-spacing: 0.14em; color: var(--muted); font-weight: 600; }
+
+@media (max-width: 760px) {
+  .tool { grid-template-columns: minmax(0, 1fr); }
+  .ep summary { grid-template-columns: 58px minmax(0, 1fr) 16px; }
+  .ep summary .ep-desc { grid-column: 2; grid-row: 2; font-size: 0.8rem; }
+  .ep summary::after { grid-column: 3; grid-row: 1; }
+  .ep summary code { white-space: normal; overflow-wrap: anywhere; }
+  .plan li { grid-template-columns: 1fr; gap: 2px; }
+}
+
+@media (max-width: 900px) {
+  .layout { grid-template-columns: minmax(0, 1fr); gap: 18px; }
+  nav.toc { position: static; }
+  nav.toc ol { grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); }
+  .stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 560px) {
+  .timeline::before { left: 7px; }
+  .timeline li { grid-template-columns: 16px minmax(0, 1fr); column-gap: 14px; }
+  .t-when { grid-column: 2; grid-row: 1; text-align: left; padding: 0; }
+  .t-dot { grid-column: 1; grid-row: 1 / span 2; margin: 4px 0 0; }
+  .t-what { grid-column: 2; }
+  .void-bar { grid-template-columns: 1fr; }
+}
+@media (prefers-reduced-motion: no-preference) { html { scroll-behavior: smooth; } }
+</style>
+<style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)} body{margin:0} img{max-width:100%} [hidden]{display:none!important}</style>
+</head>
+<body>
+
+<div class="wrap hero-band">
+  <header class="hero">
+    <div class="brand"><img src="data:image/png;base64,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" alt="Muuvo"></div>
+    <div class="eyebrow">Partner API <span class="dot"></span> Integration guide</div>
+    <h1>Connecting your platform to <span class="sky">Muuvo.</span></h1>
+    <p class="lede">How to send tenancies to Muuvo, when to send each piece of data, how the British Gas void service works, and how to read back the utility and council details we add to each property. Use it alongside the Swagger reference.</p>
+    <div class="stats">
+      <div class="stat"><b>≤ 2 hrs</b><span>Utility data</span><small>usually instant after a property is created</small></div>
+      <div class="stat"><b>5 days</b><span>Move-in readings</span><small>latest after the move-in date</small></div>
+      <div class="stat"><b>~60 days</b><span>Move-out notice</span><small>send the end of tenancy as soon as notice is given</small></div>
+      <div class="stat"><b>30 days</b><span>Void credit</span><small>zero standing charge from move-out</small></div>
+    </div>
+  </header>
+  <div class="meta">
+    <span><b>API version</b> 1.0</span>
+    <span><b>Staging</b> <a href="https://agent.muuvostaging.com/swagger/index.html" target="_blank" rel="noopener">agent.muuvostaging.com</a></span>
+    <span><b>Production</b> confirmed at go-live</span>
+    <span><b>Auth</b> <code>X-Muuvo-Key</code> header</span>
+  </div>
+</div>
+
+<div class="wrap layout">
+  <nav class="toc" aria-label="Contents">
+    <label class="search" for="search"><span class="sec-label">Search the guide</span><input id="search" type="search" placeholder="e.g. MPAN, void, /end"></label>
+    <p class="sec-label">Contents</p>
+    <ol>
+      <li><a href="#lifecycle">The tenancy lifecycle</a></li>
+      <li><a href="#onboarding">Onboarding agencies</a></li>
+      <li><a href="#auth">Authentication</a></li>
+      <li><a href="#build">Building a tenancy</a></li>
+      <li><a href="#builder">Build a pre-tenancy</a></li>
+      <li><a href="#fields">Fields that drive the service</a></li>
+      <li><a href="#timings">When to send data</a></li>
+      <li><a href="#planner">Plan your calls</a></li>
+      <li><a href="#void">The void service</a></li>
+      <li><a href="#utility">Reading utility &amp; council data</a></li>
+      <li><a href="#ids">IDs and avoiding duplicates</a></li>
+      <li><a href="#status">Status and reporting</a></li>
+      <li><a href="#golive">Testing and go-live</a></li>
+      <li><a href="#notes">Technical notes</a></li>
+    </ol>
+  </nav>
+
+  <main>
+    <p class="no-results" id="no-results" hidden>Nothing in the guide matches that search. Try a field name such as <code>voidService</code> or an endpoint such as <code>/end</code>.</p>
+    <!-- Lifecycle -->
+    <section id="lifecycle">
+      <div class="sec-head"><h2>The tenancy lifecycle</h2><span class="sec-label">Overview</span></div>
+      <p>Muuvo handles the change of occupier for every tenancy you send: notifying the council and the water and energy suppliers, offering tenants broadband and energy, and switching the property onto a void tariff when tenants leave. Your job is to send each stage at the right moment. We queue everything and release it at the right time.</p>
+      <ol class="timeline">
+        <li><span class="t-when">References OK</span><span class="t-dot solid"></span><div class="t-what"><b>Send the pre-tenancy</b><span><code>POST /tenancies</code> as soon as references are accepted, whether move-in is days or months away.</span></div></li>
+        <li><span class="t-when">≤ 2 hours</span><span class="t-dot"></span><div class="t-what"><b>Utility and council data available</b><span>Suppliers, meter serial numbers and MPAN/MPRN are added to the property, usually instantly.</span></div></li>
+        <li><span class="t-when">Move-in</span><span class="t-dot solid"></span><div class="t-what"><b>Tenants move in</b><span>Complete the check-in inventory and take meter readings.</span></div></li>
+        <li><span class="t-when">≤ +5 days</span><span class="t-dot"></span><div class="t-what"><b>Send the move-in readings</b><span><code>POST /tenancies/{id}/start</code> no later than five days after move-in.</span></div></li>
+        <li><span class="t-when">Notice given</span><span class="t-dot amber"></span><div class="t-what"><b>Send the end of tenancy</b><span><code>POST /tenancies/{id}/end</code> as soon as notice is given, typically around 60 days before move-out.</span></div></li>
+        <li><span class="t-when">−5 days</span><span class="t-dot amber"></span><div class="t-what"><b>Void switch released</b><span>Muuvo releases the property to British Gas, our void partner.</span></div></li>
+        <li><span class="t-when">Move-out</span><span class="t-dot amber"></span><div class="t-what"><b>Send closing readings</b><span>Call <code>/end</code> again with the closing readings and the tenants' forwarding address.</span></div></li>
+        <li><span class="t-when">+30 days</span><span class="t-dot"></span><div class="t-what"><b>Void period covered</b><span>Bill credit and zero standing charge for 30 days from move-out.</span></div></li>
+      </ol>
+    </section>
+
+    <!-- Onboarding -->
+    <section id="onboarding">
+      <div class="sec-head"><h2>Onboarding agencies</h2><span class="sec-label">Setup</span></div>
+      <p>Each letting agency you work with is set up as its own company within Muuvo, with its own API key. Send each agency's tenancies using that agency's key. This is how we know which agency a tenancy belongs to, who to contact, and where agency-addressed void bills should go.</p>
+      <ul>
+        <li><b>We set them up for you.</b> Send us each agency's name, phone number, email and office address. We can do this one at a time as agencies join, or in bulk from a list.</li>
+        <li><b>Or create them yourself.</b> If you'd rather create agencies from within your own platform, <code>POST /companies</code> is available as part of our V2 API. Ask your Muuvo contact for the V2 documentation and access.</li>
+      </ul>
+      <div class="note teal"><strong>Good to know</strong><p>Void bills are never addressed to the integration partner. They go to the agency's correspondence address from its company profile, or to the landlord, depending on <code>voidBillCorrespondenceAddress</code> on each tenancy.</p></div>
+    </section>
+
+    <!-- Auth -->
+    <section id="auth">
+      <div class="sec-head"><h2>Authentication</h2><span class="sec-label">Setup</span></div>
+      <p>Send the agency's key in the <code>X-Muuvo-Key</code> header on every request. Staging keys are issued at the start of your integration. Production keys are issued once your test data has been signed off.</p>
+      <div class="code">
+        <div class="code-head"><span>Example request</span><button type="button" data-copy>Copy</button></div>
+<pre>curl https://agent.muuvostaging.com/services/tenancies/10234 \
+  -H "<span class="k">X-Muuvo-Key</span>: <span class="s">YOUR_AGENCY_KEY</span>" \
+  -H "<span class="k">Accept</span>: <span class="s">application/json</span>"</pre>
+      </div>
+      <p>Every create and update returns the same response shape. Keep the <code>resultId</code>: it's the ID of the record you just created.</p>
+      <div class="code">
+        <div class="code-head"><span>APIResponse</span><button type="button" data-copy>Copy</button></div>
+<pre>{
+  "<span class="k">resultCode</span>": <span class="s">"..."</span>,
+  "<span class="k">resultId</span>": <span class="s">10234</span>,
+  "<span class="k">Errors</span>": []
+}</pre>
+      </div>
+    </section>
+
+    <!-- Build -->
+    <section id="build">
+      <div class="sec-head"><h2>Building a tenancy</h2><span class="sec-label">Workflow</span></div>
+      <p>Records build on each other. Create them in this order and keep each returned ID for the next step.</p>
+      <ol class="steps">
+        <li><div><b>Landlord</b><span><code>POST /landlords</code> returns the landlord ID.</span></div></li>
+        <li><div><b>Property</b><span><code>POST /properties</code> with the <code>landlordId</code> and the property address. Returns the property ID, and we start matching meters and council straight away.</span></div></li>
+        <li><div><b>Pre-tenancy</b><span><code>POST /tenancies</code> with the <code>propertyId</code>, dates and service options. Returns the tenancy ID.</span></div></li>
+        <li><div><b>Tenants</b><span><code>POST /tenancies/{tenancyId}/tenants</code> once for each tenant.</span></div></li>
+        <li><div><b>Start</b><span><code>POST /tenancies/{tenancyId}/start</code> with the move-in readings.</span></div></li>
+        <li><div><b>End</b><span><code>POST /tenancies/{tenancyId}/end</code> when notice is given, then again at move-out with closing readings.</span></div></li>
+      </ol>
+
+      <h3>Endpoint reference</h3>
+      <p>Select an endpoint to see its fields and an example request and response.</p>
+      <div id="endpoints" class="ep-list"></div>
+    </section>
+
+    <section id="builder">
+      <div class="sec-head"><h2>Build a pre-tenancy</h2><span class="sec-label">Tool</span></div>
+      <p>Set the options for a tenancy and copy the request body for <code>POST /tenancies</code>. The summary shows what Muuvo will do with it.</p>
+      <div class="tool">
+        <form class="tool-form" id="pb-form" autocomplete="off">
+          <div class="row2">
+            <label for="pb-property">Property ID<input id="pb-property" type="number" value="20481" min="1"></label>
+            <label for="pb-address">Void bills go to<select id="pb-address"><option>Property Agent Address</option><option>Landlord Address</option></select></label>
+          </div>
+          <div class="row2">
+            <label for="pb-start">Tenancy start<input id="pb-start" type="date" value="2026-12-01"></label>
+            <label for="pb-end">Tenancy end<input id="pb-end" type="date" value="2027-11-30"></label>
+          </div>
+          <fieldset>
+            <legend>Service</legend>
+            <label class="tick" for="pb-notify"><input id="pb-notify" type="checkbox" checked> Notify council and suppliers</label>
+            <label class="tick" for="pb-void"><input id="pb-void" type="checkbox" checked> Void service</label>
+            <label class="tick" for="pb-furnished"><input id="pb-furnished" type="checkbox"> Furnished</label>
+          </fieldset>
+          <fieldset>
+            <legend>Bills included in the rent</legend>
+            <label class="tick" for="pb-ct"><input id="pb-ct" type="checkbox"> Council tax</label>
+            <label class="tick" for="pb-gas"><input id="pb-gas" type="checkbox"> Gas</label>
+            <label class="tick" for="pb-elec"><input id="pb-elec" type="checkbox"> Electric</label>
+            <label class="tick" for="pb-water"><input id="pb-water" type="checkbox"> Water</label>
+          </fieldset>
+        </form>
+        <div class="tool-out">
+          <div class="code">
+            <div class="code-head"><span>POST /tenancies</span><button type="button" data-copy>Copy</button></div>
+            <pre id="pb-json"></pre>
+          </div>
+          <div class="summary" id="pb-summary" aria-live="polite"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Fields -->
+    <section id="fields">
+      <div class="sec-head"><h2>Fields that drive the service</h2><span class="sec-label">Workflow</span></div>
+      <p>These fields on the tenancy decide what Muuvo does on your behalf. Set them on every pre-tenancy.</p>
+      <div class="fields">
+        <article class="field">
+          <h4>voidBillCorrespondenceAddress</h4>
+          <p>Where void-period bills are sent.</p>
+          <div class="vals">
+            <div><span class="pill">Property Agent Address</span><span>The agency's correspondence address from its company profile</span></div>
+            <div><span class="pill">Landlord Address</span><span>The landlord's correspondence address</span></div>
+          </div>
+        </article>
+        <article class="field">
+          <h4>sendCouncilAndUtilityNotifications</h4>
+          <p>Whether we notify the council and utility suppliers of the change of occupier.</p>
+          <div class="vals">
+            <div><span class="pill">true</span><span>Go ahead and notify. <span class="rec">Recommended</span></span></div>
+            <div><span class="pill amber">false</span><span>No notifications. The tenant is still offered our services. Use only for properties that need excluding.</span></div>
+          </div>
+        </article>
+        <article class="field">
+          <h4>areAnyBillsIncludedInTheRent</h4>
+          <p>Set per utility: <code>councilTax</code>, <code>gas</code>, <code>electric</code>, <code>water</code>.</p>
+          <div class="vals">
+            <div><span class="pill amber">true</span><span>Included in the rent. We won't notify that council or supplier.</span></div>
+            <div><span class="pill">false</span><span>Not included. We notify them.</span></div>
+          </div>
+        </article>
+        <article class="field">
+          <h4>voidService</h4>
+          <p>Opts the tenancy into the void service.</p>
+          <div class="vals">
+            <div><span class="pill">true</span><span>Always set this. <span class="rec">Recommended</span> Our rules only switch properties that qualify.</span></div>
+            <div><span class="pill amber">false</span><span>Only when a landlord doesn't want the property switched.</span></div>
+          </div>
+        </article>
+        <article class="field">
+          <h4>isStudentLet</h4>
+          <p>Tells the council it's a student property. Tenants still need to apply for their own council tax exemption. Being added to the tenancy create.</p>
+        </article>
+      </div>
+    </section>
+
+    <!-- Timings -->
+    <section id="timings">
+      <div class="sec-head"><h2>When to send data</h2><span class="sec-label">Timings</span></div>
+      <p>Send each stage as early as you can. Everything sits in our queue until the right moment, so early is never too early.</p>
+      <div class="table-scroll">
+        <table>
+          <thead><tr><th>Stage</th><th>Call</th><th>Send it</th><th>What happens</th></tr></thead>
+          <tbody>
+            <tr><td><b>Pre-tenancy</b></td><td><code>POST /tenancies</code></td><td>As soon as references are accepted</td><td>Queued until the right time to notify and pitch services</td></tr>
+            <tr><td><b>Move-in readings</b></td><td><code>POST /tenancies/{id}/start</code></td><td>Once the check-in inventory is done, no later than 5 days after move-in</td><td>Opening readings recorded for council and suppliers</td></tr>
+            <tr><td><b>Notice</b></td><td><code>POST /tenancies/{id}/end</code></td><td>As soon as notice is given (often ~60 days before move-out)</td><td>Void switch queued</td></tr>
+            <tr><td><b>Move-out readings</b></td><td><code>POST /tenancies/{id}/end</code></td><td>On move-out, with readings and forwarding address</td><td>Closing readings and forwarding address recorded</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section id="planner">
+      <div class="sec-head"><h2>Plan your calls</h2><span class="sec-label">Tool</span></div>
+      <p>Enter the dates for a tenancy to see when each call is due and when the void switch is released.</p>
+      <div class="tool">
+        <form class="tool-form" id="tp-form" autocomplete="off">
+          <label for="tp-refs">References accepted<input id="tp-refs" type="date" value="2026-11-10"></label>
+          <label for="tp-movein">Move-in<input id="tp-movein" type="date" value="2026-12-01"></label>
+          <label for="tp-notice">Notice given <small>(optional)</small><input id="tp-notice" type="date" value="2027-09-01"></label>
+          <label for="tp-moveout">Move-out<input id="tp-moveout" type="date" value="2027-10-31"></label>
+        </form>
+        <div class="tool-out">
+          <ol class="plan" id="tp-plan"></ol>
+          <div id="tp-flags" aria-live="polite"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Void -->
+    <section id="void">
+      <div class="sec-head"><h2>The void service</h2><span class="sec-label">Service</span></div>
+      <p>Between tenancies, the landlord is usually liable for the bills. The void service takes the cost out of that gap. It only works if we know about the move-out early, which is why we ask for the end of tenancy as soon as notice is given.</p>
+      <div class="void-bar" role="img" aria-label="Five days before move-out the switch is released; from move-out a 30 day bill credit and zero standing charge apply">
+        <div class="vb-1"><b>5 days before</b>Released to British Gas</div>
+        <div class="vb-2">Move-out</div>
+        <div class="vb-3"><b>30 days</b>Bill credit and zero standing charge in the landlord's name</div>
+      </div>
+      <ul>
+        <li>Five days before move-out, we release the property to British Gas, our void partner, so the supply goes live in the landlord's name.</li>
+        <li>From move-out day, the landlord gets a bill credit and a zero standing charge for 30 days.</li>
+        <li>Void bills under £30 and under 30 days are zeroed. This saves landlords and agents a lot of money, and commission is available on every switch.</li>
+        <li>We don't switch properties that don't qualify, for example where a new tenancy has already started or is about to.</li>
+      </ul>
+    </section>
+
+    <!-- Utility -->
+    <section id="utility">
+      <div class="sec-head"><h2>Reading utility &amp; council data</h2><span class="sec-label">Data</span></div>
+      <p>When you create a property, Muuvo matches it against the national database and adds the council, water supplier, energy suppliers and meter details. You can read them back with either ID.</p>
+      <div class="table-scroll">
+        <table>
+          <thead><tr><th>Call</th><th>Returns</th></tr></thead>
+          <tbody>
+            <tr><td><code>GET /properties/{id}</code></td><td>Council, council tax band and cost, water supplier, UPRN; gas supplier, MPRN, meter serial, smart and prepay flags; electric supplier, MPAN, meter serial, smart, prepay and Economy 7 flags</td></tr>
+            <tr><td><code>GET /tenancies/{id}</code></td><td>Everything on the tenancy, plus electricity, gas and water meters with start and end readings, and the tenants</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="note teal"><strong>Timing</strong><p>This data is usually available straight away. If a property doesn't match the national database, our team maps it to the correct meters manually. This takes up to two hours.</p></div>
+    </section>
+
+    <!-- IDs -->
+    <section id="ids">
+      <div class="sec-head"><h2>IDs and avoiding duplicates</h2><span class="sec-label">Data</span></div>
+      <p>Each create call makes a new record, so posting the same tenancy twice creates two tenancies. To avoid this:</p>
+      <ul>
+        <li>Store the landlord, property and tenancy IDs we return against your own records.</li>
+        <li>Use <code>PUT</code> with the stored ID for any change or correction. Don't post the record again.</li>
+        <li>Before creating a tenancy, check whether you already hold a Muuvo tenancy ID for it.</li>
+      </ul>
+    </section>
+
+    <!-- Status -->
+    <section id="status">
+      <div class="sec-head"><h2>Status and reporting</h2><span class="sec-label">Reporting</span></div>
+      <ul>
+        <li><b>Completion.</b> When the council, water and energy have all been notified, we send a letting agent receipt to the agency. This is the last step for both a move-in and a move-out. A matching confirmation through the API is being planned.</li>
+        <li><b>Monthly reports.</b> Everything is reported against the tenancy ID. You'll receive monthly reports covering the agencies in your portfolio, including services taken and commission.</li>
+        <li><b>Webhooks.</b> There are no webhooks at present. Posting sales outcomes back against each tenancy is something we can look at with you.</li>
+      </ul>
+      <div class="note"><strong>Not for integrators</strong><p><code>/addSales</code> appears in the Swagger, but it's used by our call centre partners to report sales to Muuvo. You don't need it.</p></div>
+    </section>
+
+    <!-- Go live -->
+    <section id="golive">
+      <div class="sec-head"><h2>Testing and go-live</h2><span class="sec-label">Launch</span></div>
+      <ol class="steps">
+        <li><div><b>Get a staging key</b><span>We issue a staging key and point you to the staging Swagger.</span></div></li>
+        <li><div><b>Build and test on staging</b><span>Staging test data doesn't need cleaning up. Submit new data freely, or ask us to remove records.</span></div></li>
+        <li><div><b>Send real-shaped test data</b><span>A handful of new tenancies and end tenancies, as described below.</span></div></li>
+        <li><div><b>Sign-off</b><span>Muuvo checks the data is complete and the timings are right.</span></div></li>
+        <li><div><b>Production</b><span>We confirm the production URL and issue production keys for each agency.</span></div></li>
+      </ol>
+      <h3>What we check before sign-off</h3>
+      <ul class="check">
+        <li>New tenancies sent at reference acceptance, with tenants added</li>
+        <li>Move-in readings with their reading dates</li>
+        <li>End tenancies sent at notice, then again with closing readings and dates</li>
+        <li>Forwarding addresses on move-out</li>
+        <li>Liable parties and <code>voidBillCorrespondenceAddress</code> set correctly</li>
+        <li>Service flags set as recommended in this guide</li>
+      </ul>
+    </section>
+
+    <!-- Notes -->
+    <section id="notes">
+      <div class="sec-head"><h2>Technical notes</h2><span class="sec-label">Reference</span></div>
+      <ul>
+        <li><b>Dates.</b> Send dates as <code>DD-MM-YYYY</code>. Dates come back as <code>YYYY-MM-DD</code>. We're confirming this applies to every field, including date of birth.</li>
+        <li><b>Date of birth casing.</b> Send <code>dateOfBirth</code>. Home buyer and tenant lead records return it as <code>dateofBirth</code>.</li>
+        <li><b>Meter numbers.</b> Store MPAN and MPRN as text, not numbers, so leading zeros are kept.</li>
+        <li><b>Rate limits.</b> Rate limits apply. Your Muuvo contact will confirm the current limits.</li>
+        <li><b>Deletes.</b> Tenancies, tenants, tenant leads and home buyers can be deleted. Landlords and properties can't be deleted through the API; ask us if you need one removed.</li>
+      </ul>
+    </section>
+  </main>
+</div>
+
+<footer>
+  <div class="wrap">
+    <div class="sign">
+      <div class="tag">Moving home made simple.</div>
+      <div class="services">Energy<span class="dot"></span>Broadband<span class="dot"></span>Insurance<span class="dot"></span>Removals</div>
+      <div class="web">muuvo.co.uk</div>
+    </div>
+    <div class="foot-right">
+      <img src="data:image/png;base64,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" alt="Muuvo">
+      <span>Muuvo Limited · Partner API integration guide · Version 1.0 · October 2026</span>
+      <span>Questions: your Muuvo integration contact</span>
+    </div>
+  </div>
+</footer>
+
+<script>
+(function () {
+  function esc(t) { return String(t).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
+  function highlight(obj) {
+    return esc(JSON.stringify(obj, null, 2))
+      .replace(/"([^"]+)":/g, '"<span class="k">$1</span>":')
+      .replace(/: ("[^"]*"|true|false|-?\d+(?:\.\d+)?)/g, ': <span class="s">$1</span>');
+  }
+  function codeBlock(title, obj) {
+    return '<div class="code"><div class="code-head"><span>' + esc(title) + '</span><button type="button" data-copy>Copy</button></div><pre>' + highlight(obj) + '</pre></div>';
+  }
+
+  /* ---------- Copy buttons (delegated, so generated blocks work too) ---------- */
+  document.addEventListener('click', function (e) {
+    var btn = e.target.closest('[data-copy]');
+    if (!btn) return;
+    var pre = btn.closest('.code').querySelector('pre');
+    function done(label) { btn.textContent = label; setTimeout(function () { btn.textContent = 'Copy'; }, 1600); }
+    function select() { var r = document.createRange(); r.selectNodeContents(pre); var sel = window.getSelection(); sel.removeAllRanges(); sel.addRange(r); done('Selected'); }
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(pre.innerText).then(function () { done('Copied'); }, select);
+    } else { select(); }
+  });
+
+  /* ---------- Example data ---------- */
+  var address = { addressLine1: 'Flat 2', addressLine2: '14 Albert Road', addressLine3: '', townOrCity: 'Cardiff', county: 'South Glamorgan', postcode: 'CF24 3AB' };
+  var landlord = { title: 'Mrs', firstName: 'Sarah', lastName: 'Thomas', companyName: '', contactNumber: '07700 900123', email: 'sarah.thomas@example.com', address: { addressLine1: '8 Heol Hir', addressLine2: '', addressLine3: '', townOrCity: 'Cardiff', county: 'South Glamorgan', postcode: 'CF14 5AA' } };
+  var tenant = { title: 'Mr', firstName: 'Daniel', lastName: 'Hughes', contactNumber: '07700 900456', email: 'daniel.hughes@example.com', dateOfBirth: '14-03-1996' };
+  var ok = { resultCode: '...', resultId: 10234, Errors: [] };
+  var pre = { tenancyStart: '01-12-2026', tenancyEnd: '30-11-2027', propertyId: 20481, sendCouncilAndUtilityNotifications: true, voidBillCorrespondenceAddress: 'Property Agent Address', isFurnished: false, voidService: true, areAnyBillsIncludedInTheRent: { councilTax: false, gas: false, electric: false, water: false } };
+  var startReads = { startElectricityReading: { meterReading1: '04512', meterReading2: '', meterReadingDate: '01-12-2026' }, startGasReading: { meterReading: '01877', meterReadingDate: '01-12-2026' }, startWaterReading: { meterReading: '00342', meterReadingDate: '01-12-2026' } };
+  var endNotice = { tenancyEnd: '31-10-2027', propertyId: 20481, sendCouncilAndUtilityNotifications: true, voidBillCorrespondenceAddress: 'Property Agent Address', voidService: true, stillManageTheProperty: true };
+  var endMoveOut = { tenancyEnd: '31-10-2027', propertyId: 20481, sendCouncilAndUtilityNotifications: true, voidBillCorrespondenceAddress: 'Property Agent Address', voidService: true, stillManageTheProperty: true, endElectricityReading: { meterReading1: '07921', meterReading2: '', meterReadingDate: '31-10-2027' }, endGasReading: { meterReading: '02964', meterReadingDate: '31-10-2027' }, endWaterReading: { meterReading: '00611', meterReadingDate: '31-10-2027' }, forwardingAddress: { addressLine1: '22 Clive Street', addressLine2: '', addressLine3: '', townOrCity: 'Bristol', county: '', postcode: 'BS1 4QD' } };
+  var property = { id: 20481, landlordId: 18342, address: address, UPRN: '10002345678', council: 'Cardiff Council', waterSupplier: 'Dwr Cymru Welsh Water', councilTaxBand: 'C', councilAnnualCost: '1,812.00', councilMonthlyCost: '151.00', gas: { isGasAvailable: true, hasGasSmartMeter: false, hasGasPrePayment: false, meterSerialNumber: 'G4A01234567', MPRN: '7412345601', supplier: 'British Gas' }, electric: { hasPrePayment: false, hasSmartMeter: true, isEconomy7: false, meterSerialNumber: 'E10Z123456', MPAN: '2100012345678', supplier: 'Octopus Energy' } };
+  var tenancyFull = { id: 10234, tenancyStart: '2026-12-01', tenancyEnd: '2027-11-30', numberOfTenants: 1, isFurnished: false, isStudentLet: false, sendCouncilAndUtilityNotifications: true, whoIsResponsibleForTheVoidPeriod: '...', voidBillCorrespondenceAddress: 'Property Agent Address', areAnyBillsIncludedInTheRent: { councilTax: false, gas: false, electric: false, water: false }, address: address, electricity: { isPrePay: false, hasSmartMeter: true, serialNumber: 'E10Z123456', MPAN: '2100012345678', isEconomy7: false, supplier: 'Octopus Energy', startElectricityReading: { meterReading1: '04512', meterReading2: '', meterReadingDate: '2026-12-01' } }, gas: { isPrePay: false, hasSmartMeter: false, serialNumber: 'G4A01234567', MPRN: '7412345601', supplier: 'British Gas', startGasReading: { meterReading: '01877', meterReadingDate: '2026-12-01' } }, water: { serialNumber: 'W0098765', startWaterReading: { reading: '00342', meterReadingDate: '2026-12-01' } }, tenants: [ Object.assign({ id: 55120 }, tenant) ] };
+
+  var EP = [
+    { m: 'POST', p: '/landlords', d: 'Create a landlord', n: 'Create the landlord first. Keep the returned resultId as the landlordId for the property.', req: landlord, res: ok },
+    { m: 'PUT', p: '/landlords/{id}', d: 'Correct landlord details', n: 'Send the full landlord record with the corrections.', req: landlord, res: ok },
+    { m: 'POST', p: '/properties', d: 'Create a property', n: 'Muuvo starts matching the council, suppliers and meters as soon as the property is created.', req: { landlordId: 18342, address: address }, res: ok },
+    { m: 'GET', p: '/properties/{id}', d: 'Read utility and council data', n: 'Usually populated straight away. If the address needs manual meter matching, allow up to two hours.', res: property },
+    { m: 'PUT', p: '/properties/{id}', d: 'Correct a property', n: 'Use this to correct the address or landlord rather than creating a new property.', req: { landlordId: 18342, address: address }, res: ok },
+    { m: 'POST', p: '/tenancies', d: 'Create a pre-tenancy', n: 'Send as soon as references are accepted. Dates are sent as DD-MM-YYYY. Use the builder below to generate this body.', req: pre, res: ok },
+    { m: 'GET', p: '/tenancies/{id}', d: 'Read the full tenancy', n: 'Returns the tenancy, meters with readings, and tenants. Dates come back as YYYY-MM-DD.', res: tenancyFull },
+    { m: 'PUT', p: '/tenancies/{id}', d: 'Update or correct a tenancy', n: 'Use the stored tenancy ID for any change. Posting again would create a duplicate.', req: pre, res: ok },
+    { m: 'DELETE', p: '/tenancies/{id}', d: 'Remove a tenancy', n: 'Removes the tenancy. Landlords and properties cannot be deleted through the API.' },
+    { m: 'POST', p: '/tenancies/{id}/tenants', d: 'Add a tenant', n: 'Call once for each tenant on the tenancy.', req: tenant, res: ok },
+    { m: 'POST', p: '/tenancies/{id}/tenants/{tenantId}', d: 'Update a tenant', n: 'Note this update uses POST, not PUT.', req: tenant, res: ok },
+    { m: 'POST', p: '/tenancies/{id}/start', d: 'Send move-in readings', n: 'Once the check-in inventory is done, and no later than five days after move-in. meterReading2 is only needed for Economy 7 meters.', req: startReads, res: ok },
+    { m: 'POST', p: '/tenancies/{id}/end', d: 'Give notice, then closing readings', n: 'Call it twice. First as soon as notice is given, without readings. Then again on move-out with closing readings and the forwarding address.', req: endNotice, req2: endMoveOut, res: ok },
+    { m: 'POST', p: '/updateForwardingAddress/{id}', d: 'Update the forwarding address', n: 'Use this if the forwarding address changes after the end of tenancy has been sent.', req: { forwardingAddress: endMoveOut.forwardingAddress }, res: ok }
+  ];
+  var cls = { GET: 'm-get', POST: 'm-post', PUT: 'm-put', DELETE: 'm-del' };
+  var host = document.getElementById('endpoints');
+  if (host) {
+    host.innerHTML = EP.map(function (e, i) {
+      var body = '<p>' + esc(e.n) + '</p>';
+      if (e.req2) {
+        body += '<h5>Request body: when notice is given</h5>' + codeBlock(e.m + ' ' + e.p, e.req);
+        body += '<h5>Request body: on move-out</h5>' + codeBlock(e.m + ' ' + e.p, e.req2);
+      } else if (e.req) {
+        body += '<h5>Request body</h5>' + codeBlock(e.m + ' ' + e.p, e.req);
+      }
+      if (e.res) body += '<h5>Example response</h5>' + codeBlock('200 OK', e.res);
+      return '<details class="ep" id="ep-' + i + '"><summary><span class="method ' + cls[e.m] + '">' + e.m + '</span><code>' + esc(e.p) + '</code><span class="ep-desc">' + esc(e.d) + '</span></summary><div class="ep-body">' + body + '</div></details>';
+    }).join('');
+  }
+
+  /* ---------- Dates ---------- */
+  function parse(v) { if (!v) return null; var a = v.split('-'); return new Date(Date.UTC(+a[0], +a[1] - 1, +a[2])); }
+  function add(d, n) { return new Date(d.getTime() + n * 86400000); }
+  function fmt(d) { return d.toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric', timeZone: 'UTC' }); }
+  function dmy(v) { var d = parse(v); if (!d) return ''; return ('0' + d.getUTCDate()).slice(-2) + '-' + ('0' + (d.getUTCMonth() + 1)).slice(-2) + '-' + d.getUTCFullYear(); }
+  function days(a, b) { return Math.round((b - a) / 86400000); }
+  function $(id) { return document.getElementById(id); }
+
+  /* ---------- Payload builder ---------- */
+  function buildPayload() {
+    var body = {
+      tenancyStart: dmy($('pb-start').value),
+      tenancyEnd: dmy($('pb-end').value),
+      propertyId: Number($('pb-property').value) || 0,
+      sendCouncilAndUtilityNotifications: $('pb-notify').checked,
+      voidBillCorrespondenceAddress: $('pb-address').value,
+      isFurnished: $('pb-furnished').checked,
+      voidService: $('pb-void').checked,
+      areAnyBillsIncludedInTheRent: { councilTax: $('pb-ct').checked, gas: $('pb-gas').checked, electric: $('pb-elec').checked, water: $('pb-water').checked }
+    };
+    $('pb-json').innerHTML = highlight(body);
+
+    var lines = [];
+    var names = { councilTax: 'the council', gas: 'the gas supplier', electric: 'the electricity supplier', water: 'the water supplier' };
+    if (!body.sendCouncilAndUtilityNotifications) {
+      lines.push(['off', 'No council or supplier notifications. The tenant is still offered Muuvo services.']);
+    } else {
+      var notify = [], skip = [];
+      Object.keys(names).forEach(function (k) { (body.areAnyBillsIncludedInTheRent[k] ? skip : notify).push(names[k]); });
+      if (notify.length) lines.push(['on', 'Muuvo notifies ' + notify.join(', ').replace(/, ([^,]*)$/, ' and $1') + '.']);
+      if (skip.length) lines.push(['off', 'Included in the rent, so not notified: ' + skip.join(', ').replace(/, ([^,]*)$/, ' and $1') + '.']);
+    }
+    lines.push(body.voidService ? ['on', 'Void switch to British Gas at move-out, if the property qualifies.'] : ['off', 'No void switch. Use this only when the landlord has asked to opt out.']);
+    lines.push(['on', 'Void bills are addressed to the ' + (body.voidBillCorrespondenceAddress === 'Landlord Address' ? 'landlord' : 'letting agency') + '.']);
+    var s = parse($('pb-start').value), e = parse($('pb-end').value);
+    if (s && e && e <= s) lines.push(['off', 'The tenancy end date is before the start date.']);
+    $('pb-summary').innerHTML = lines.map(function (l) { return '<div><i class="' + (l[0] === 'off' ? 'off' : '') + '"></i><span>' + esc(l[1]) + '</span></div>'; }).join('');
+  }
+  if ($('pb-form')) { $('pb-form').addEventListener('input', buildPayload); $('pb-form').addEventListener('change', buildPayload); $('pb-form').addEventListener('submit', function (e) { e.preventDefault(); }); buildPayload(); }
+
+  /* ---------- Timing planner ---------- */
+  function plan() {
+    var refs = parse($('tp-refs').value), mi = parse($('tp-movein').value), notice = parse($('tp-notice').value), mo = parse($('tp-moveout').value);
+    var rows = [], flags = [];
+    if (refs) rows.push({ d: refs, k: 'api', t: 'Send the pre-tenancy', x: 'POST /tenancies' });
+    if (mi) {
+      rows.push({ d: mi, k: '', t: 'Tenants move in', x: 'Complete the check-in inventory and take meter readings' });
+      rows.push({ d: add(mi, 5), k: 'api', lbl: 'Deadline', t: 'Send the move-in readings', x: 'POST /tenancies/{id}/start, any time from move-in until this date' });
+    }
+    if (notice) rows.push({ d: notice, k: 'api', t: 'Send the end of tenancy', x: 'POST /tenancies/{id}/end, as soon as notice is given' });
+    if (mo) {
+      rows.push({ d: add(mo, -5), k: 'void', t: 'Void switch released', x: 'Muuvo releases the property to British Gas' });
+      rows.push({ d: mo, k: 'api', t: 'Send closing readings', x: 'POST /tenancies/{id}/end again, with readings and forwarding address' });
+      rows.push({ d: add(mo, 30), k: 'void', lbl: 'Ends', t: '30-day void credit period ends', x: 'Bill credit and zero standing charge run from move-out to this date' });
+    }
+    rows.sort(function (a, b) { return a.d - b.d; });
+    $('tp-plan').innerHTML = rows.map(function (r) {
+      return '<li class="' + r.k + '"><span class="when">' + (r.lbl ? '<small>' + r.lbl + '</small>' : '') + fmt(r.d) + '</span><span class="what"><b>' + esc(r.t) + '</b>' + esc(r.x) + '</span></li>';
+    }).join('');
+
+    if (refs && mi && refs > mi) flags.push(['amber', 'Check the dates', 'References are accepted after the move-in date. Send the pre-tenancy as soon as possible.']);
+    if (mi && mo && mo <= mi) flags.push(['amber', 'Check the dates', 'Move-out is on or before move-in.']);
+    if (notice && mo) {
+      var lead = days(notice, mo);
+      if (lead < 0) flags.push(['amber', 'Check the dates', 'Notice is dated after move-out.']);
+      else if (lead < 5) flags.push(['amber', 'Late notice', 'Notice arrives after the void switch would normally be released (' + lead + ' days before move-out). Send the end of tenancy immediately so British Gas has as much time as possible.']);
+      else flags.push(['teal', 'On track', lead + ' days between notice and move-out. That gives Muuvo time to queue the void switch.']);
+    } else if (mo) {
+      flags.push(['', 'Notice date', 'Add the date notice is given to check there is enough time for the void switch.']);
+    }
+    $('tp-flags').innerHTML = flags.map(function (f) { return '<div class="note ' + f[0] + '"><strong>' + esc(f[1]) + '</strong><p>' + esc(f[2]) + '</p></div>'; }).join('');
+  }
+  if ($('tp-form')) { $('tp-form').addEventListener('input', plan); $('tp-form').addEventListener('change', plan); $('tp-form').addEventListener('submit', function (e) { e.preventDefault(); }); plan(); }
+
+  /* ---------- Search ---------- */
+  var sections = Array.prototype.slice.call(document.querySelectorAll('main section'));
+  var links = Array.prototype.slice.call(document.querySelectorAll('nav.toc a'));
+  var search = $('search');
+  function runSearch() {
+    var q = search.value.trim().toLowerCase();
+    var any = false;
+    sections.forEach(function (sec) {
+      var hit = !q || sec.textContent.toLowerCase().indexOf(q) !== -1;
+      sec.hidden = !hit;
+      if (hit) any = true;
+      var link = links.filter(function (a) { return a.getAttribute('href') === '#' + sec.id; })[0];
+      if (link) link.parentNode.hidden = !hit;
+      sec.querySelectorAll('details.ep').forEach(function (d) {
+        var m = !q || d.textContent.toLowerCase().indexOf(q) !== -1;
+        d.hidden = !m;
+        d.open = !!q && m && q.length > 2;
+      });
+    });
+    $('no-results').hidden = any;
+  }
+  if (search) search.addEventListener('input', runSearch);
+
+  /* ---------- Contents highlighting ---------- */
+  if ('IntersectionObserver' in window) {
+    var obs = new IntersectionObserver(function (entries) {
+      entries.forEach(function (e) {
+        if (e.isIntersecting) links.forEach(function (a) { a.classList.toggle('active', a.getAttribute('href') === '#' + e.target.id); });
+      });
+    }, { rootMargin: '-20% 0px -70% 0px' });
+    sections.forEach(function (s) { obs.observe(s); });
+  }
+})();
+
+</script>
+
+</body>
+</html>
