@@ -406,14 +406,14 @@ mark { background: #fff0c2; color: inherit; border-radius: 2px; }
             <label for="pb-start">Tenancy start<input id="pb-start" type="date"></label>
             <label for="pb-end">Tenancy end<input id="pb-end" type="date"></label>
           </div>
-          <label for="pb-who">Who is responsible for the void period<input id="pb-who" type="text"></label>
+          <label for="pb-who">Who is responsible for the void period<select id="pb-who"><option>Landlord</option><option>Property Agent</option></select></label>
           <fieldset>
             <legend>Service</legend>
             <label class="tick" for="pb-notify"><input id="pb-notify" type="checkbox" checked> Notify council and suppliers</label>
             <label class="tick" for="pb-void"><input id="pb-void" type="checkbox" checked> Void service</label>
             <label class="tick" for="pb-furnished"><input id="pb-furnished" type="checkbox"> Furnished</label>
-            <label class="tick" for="pb-media"><input id="pb-media" type="checkbox" checked> Tenant service opt-in: media</label>
-            <label class="tick" for="pb-energy"><input id="pb-energy" type="checkbox" checked> Tenant service opt-in: energy</label>
+            <label class="tick" for="pb-media"><input id="pb-media" type="checkbox"> Tenant service opt-in: media</label>
+            <label class="tick" for="pb-energy"><input id="pb-energy" type="checkbox"> Tenant service opt-in: energy</label>
           </fieldset>
           <fieldset>
             <legend>Bills included in the rent</legend>
@@ -460,6 +460,14 @@ mark { background: #fff0c2; color: inherit; border-radius: 2px; }
           <div class="vals">
             <div><span class="pill">Property Agent Address</span><span>The agency's correspondence address from its company profile</span></div>
             <div><span class="pill">Landlord Address</span><span>The landlord's correspondence address</span></div>
+          </div>
+        </article>
+        <article class="field">
+          <h4>whoIsResponsibleForTheVoidPeriod</h4>
+          <p>Who is liable for the bills while the property is empty.</p>
+          <div class="vals">
+            <div><span class="pill">Landlord</span><span>The landlord is responsible for the void period</span></div>
+            <div><span class="pill">Property Agent</span><span>The letting agency is responsible for the void period</span></div>
           </div>
         </article>
         <article class="field">
@@ -739,6 +747,7 @@ mark { background: #fff0c2; color: inherit; border-radius: 2px; }
       if (skip.length) lines.push(['off', 'Included in the rent, so not notified: ' + skip.join(', ').replace(/, ([^,]*)$/, ' and $1') + '.']);
     }
     lines.push(body.voidService ? ['on', 'Void switch to British Gas at move-out, if the property qualifies.'] : ['off', 'No void switch. Use this only when the landlord has asked to opt out.']);
+    lines.push(['on', (body.whoIsResponsibleForTheVoidPeriod === 'Landlord' ? 'The landlord' : 'The letting agency') + ' is responsible for the void period.']);
     lines.push(['on', 'Void bills are addressed to the ' + (body.voidBillCorrespondenceAddress === 'Landlord Address' ? 'landlord' : 'letting agency') + '.']);
     var s = parse($('pb-start').value), e = parse($('pb-end').value);
     if (s && e && e <= s) lines.push(['off', 'The tenancy end date is before the start date.']);
