@@ -358,7 +358,7 @@ mark { background: #fff0c2; color: inherit; border-radius: 2px; }
       </div>
       <div class="code">
         <div class="code-head"><span>Example request</span><button type="button" data-copy>Copy</button></div>
-<pre>curl https://agent.muuvostaging.com/services/tenancies/10234 \
+<pre>curl https://agent.muuvostaging.com/services/tenancies/{tenancyId} \
   -H "<span class="k">X-Muuvo-Key</span>: <span class="s">YOUR_AGENCY_KEY</span>" \
   -H "<span class="k">Accept</span>: <span class="s">application/json</span>"</pre>
       </div>
@@ -366,9 +366,11 @@ mark { background: #fff0c2; color: inherit; border-radius: 2px; }
       <div class="code">
         <div class="code-head"><span>APIResponse</span><button type="button" data-copy>Copy</button></div>
 <pre>{
-  "<span class="k">resultCode</span>": <span class="s">"..."</span>,
-  "<span class="k">resultId</span>": <span class="s">10234</span>,
-  "<span class="k">Errors</span>": []
+  "<span class="k">resultCode</span>": <span class="s">"string"</span>,
+  "<span class="k">resultId</span>": <span class="s">0</span>,
+  "<span class="k">Errors</span>": [
+    <span class="s">"string"</span>
+  ]
 }</pre>
       </div>
     </section>
@@ -393,22 +395,25 @@ mark { background: #fff0c2; color: inherit; border-radius: 2px; }
 
     <section id="builder">
       <div class="sec-head"><h2>Build a pre-tenancy</h2><span class="sec-label">Tool</span></div>
-      <p>Set the options for a tenancy and copy the request body for <code>POST /tenancies</code>. The summary shows what Muuvo will do with it.</p>
+      <p>Fill in a tenancy and copy the request body for <code>POST /tenancies</code>. It contains every field in the Swagger definition, in the same order; anything left blank is sent empty. The summary shows what Muuvo will do with it.</p>
       <div class="tool">
         <form class="tool-form" id="pb-form" autocomplete="off">
           <div class="row2">
-            <label for="pb-property">Property ID<input id="pb-property" type="number" value="20481" min="1"></label>
+            <label for="pb-property">Property ID<input id="pb-property" type="number" min="0" placeholder="0"></label>
             <label for="pb-address">Void bills go to<select id="pb-address"><option>Property Agent Address</option><option>Landlord Address</option></select></label>
           </div>
           <div class="row2">
-            <label for="pb-start">Tenancy start<input id="pb-start" type="date" value="2026-12-01"></label>
-            <label for="pb-end">Tenancy end<input id="pb-end" type="date" value="2027-11-30"></label>
+            <label for="pb-start">Tenancy start<input id="pb-start" type="date"></label>
+            <label for="pb-end">Tenancy end<input id="pb-end" type="date"></label>
           </div>
+          <label for="pb-who">Who is responsible for the void period<input id="pb-who" type="text"></label>
           <fieldset>
             <legend>Service</legend>
             <label class="tick" for="pb-notify"><input id="pb-notify" type="checkbox" checked> Notify council and suppliers</label>
             <label class="tick" for="pb-void"><input id="pb-void" type="checkbox" checked> Void service</label>
             <label class="tick" for="pb-furnished"><input id="pb-furnished" type="checkbox"> Furnished</label>
+            <label class="tick" for="pb-media"><input id="pb-media" type="checkbox" checked> Tenant service opt-in: media</label>
+            <label class="tick" for="pb-energy"><input id="pb-energy" type="checkbox" checked> Tenant service opt-in: energy</label>
           </fieldset>
           <fieldset>
             <legend>Bills included in the rent</legend>
@@ -416,6 +421,22 @@ mark { background: #fff0c2; color: inherit; border-radius: 2px; }
             <label class="tick" for="pb-gas"><input id="pb-gas" type="checkbox"> Gas</label>
             <label class="tick" for="pb-elec"><input id="pb-elec" type="checkbox"> Electric</label>
             <label class="tick" for="pb-water"><input id="pb-water" type="checkbox"> Water</label>
+          </fieldset>
+          <fieldset>
+            <legend>Meter readings, if you have them</legend>
+            <div class="row2">
+              <label for="pb-gasr">Gas reading<input id="pb-gasr" type="text" inputmode="numeric"></label>
+              <label for="pb-gasd">Gas reading date<input id="pb-gasd" type="date"></label>
+            </div>
+            <div class="row2">
+              <label for="pb-elr">Electric reading<input id="pb-elr" type="text" inputmode="numeric"></label>
+              <label for="pb-elr2">Electric reading 2 <small>(Economy 7)</small><input id="pb-elr2" type="text" inputmode="numeric"></label>
+            </div>
+            <label for="pb-eld">Electric reading date<input id="pb-eld" type="date"></label>
+            <div class="row2">
+              <label for="pb-war">Water reading<input id="pb-war" type="text" inputmode="numeric"></label>
+              <label for="pb-wad">Water reading date<input id="pb-wad" type="date"></label>
+            </div>
           </fieldset>
         </form>
         <div class="tool-out">
@@ -634,45 +655,41 @@ mark { background: #fff0c2; color: inherit; border-radius: 2px; }
     } else { select(); }
   });
 
-  /* ---------- Example data ---------- */
-  var address = { addressLine1: 'Flat 2', addressLine2: '14 Albert Road', addressLine3: '', townOrCity: 'Cardiff', county: 'South Glamorgan', postcode: 'CF24 3AB' };
-  var landlord = { title: 'Mrs', firstName: 'Sarah', lastName: 'Thomas', companyName: '', contactNumber: '07700 900123', email: 'sarah.thomas@example.com', address: { addressLine1: '8 Heol Hir', addressLine2: '', addressLine3: '', townOrCity: 'Cardiff', county: 'South Glamorgan', postcode: 'CF14 5AA' } };
-  var tenant = { title: 'Mr', firstName: 'Daniel', lastName: 'Hughes', contactNumber: '07700 900456', email: 'daniel.hughes@example.com', dateOfBirth: '14-03-1996' };
-  var ok = { resultCode: '...', resultId: 10234, Errors: [] };
-  var pre = { tenancyStart: '01-12-2026', tenancyEnd: '30-11-2027', propertyId: 20481, sendCouncilAndUtilityNotifications: true, voidBillCorrespondenceAddress: 'Property Agent Address', isFurnished: false, voidService: true, areAnyBillsIncludedInTheRent: { councilTax: false, gas: false, electric: false, water: false } };
-  var startReads = { startElectricityReading: { meterReading1: '04512', meterReading2: '', meterReadingDate: '01-12-2026' }, startGasReading: { meterReading: '01877', meterReadingDate: '01-12-2026' }, startWaterReading: { meterReading: '00342', meterReadingDate: '01-12-2026' } };
-  var endNotice = { tenancyEnd: '31-10-2027', propertyId: 20481, sendCouncilAndUtilityNotifications: true, voidBillCorrespondenceAddress: 'Property Agent Address', voidService: true, stillManageTheProperty: true };
-  var endMoveOut = { tenancyEnd: '31-10-2027', propertyId: 20481, sendCouncilAndUtilityNotifications: true, voidBillCorrespondenceAddress: 'Property Agent Address', voidService: true, stillManageTheProperty: true, endElectricityReading: { meterReading1: '07921', meterReading2: '', meterReadingDate: '31-10-2027' }, endGasReading: { meterReading: '02964', meterReadingDate: '31-10-2027' }, endWaterReading: { meterReading: '00611', meterReadingDate: '31-10-2027' }, forwardingAddress: { addressLine1: '22 Clive Street', addressLine2: '', addressLine3: '', townOrCity: 'Bristol', county: '', postcode: 'BS1 4QD' } };
-  var property = { id: 20481, landlordId: 18342, address: address, UPRN: '10002345678', council: 'Cardiff Council', waterSupplier: 'Dwr Cymru Welsh Water', councilTaxBand: 'C', councilAnnualCost: '1,812.00', councilMonthlyCost: '151.00', gas: { isGasAvailable: true, hasGasSmartMeter: false, hasGasPrePayment: false, meterSerialNumber: 'G4A01234567', MPRN: '7412345601', supplier: 'British Gas' }, electric: { hasPrePayment: false, hasSmartMeter: true, isEconomy7: false, meterSerialNumber: 'E10Z123456', MPAN: '2100012345678', supplier: 'Octopus Energy' } };
-  var tenancyFull = { id: 10234, tenancyStart: '2026-12-01', tenancyEnd: '2027-11-30', numberOfTenants: 1, isFurnished: false, isStudentLet: false, sendCouncilAndUtilityNotifications: true, whoIsResponsibleForTheVoidPeriod: '...', voidBillCorrespondenceAddress: 'Property Agent Address', areAnyBillsIncludedInTheRent: { councilTax: false, gas: false, electric: false, water: false }, address: address, electricity: { isPrePay: false, hasSmartMeter: true, serialNumber: 'E10Z123456', MPAN: '2100012345678', isEconomy7: false, supplier: 'Octopus Energy', startElectricityReading: { meterReading1: '04512', meterReading2: '', meterReadingDate: '2026-12-01' } }, gas: { isPrePay: false, hasSmartMeter: false, serialNumber: 'G4A01234567', MPRN: '7412345601', supplier: 'British Gas', startGasReading: { meterReading: '01877', meterReadingDate: '2026-12-01' } }, water: { serialNumber: 'W0098765', startWaterReading: { reading: '00342', meterReadingDate: '2026-12-01' } }, tenants: [ Object.assign({ id: 55120 }, tenant) ] };
+  /* ---------- Examples: exactly as generated by the Swagger definitions ---------- */
+  var address = { addressLine1: 'string', addressLine2: 'string', addressLine3: 'string', townOrCity: 'string', county: 'string', postcode: 'string' };
+  var addLandlord = { title: 'string', firstName: 'string', lastName: 'string', companyName: 'string', contactNumber: 'string', email: 'string', address: address };
+  var addProperty = { landlordId: 0, address: address };
+  var addTenant = { title: 'string', firstName: 'string', lastName: 'string', contactNumber: 'string', email: 'string', dateOfBirth: 'string' };
+  var ok = { resultCode: 'string', resultId: 0, Errors: ['string'] };
+  var bills = { councilTax: true, gas: true, electric: true, water: true };
+  var preTenancy = { tenancyStart: 'string', tenancyEnd: 'string', propertyId: 0, sendCouncilAndUtilityNotifications: true, whoIsResponsibleForTheVoidPeriod: 'string', voidBillCorrespondenceAddress: 'string', isFurnished: true, areAnyBillsIncludedInTheRent: bills, 'tenantServiceOptIn-Media': true, 'tenantServiceOptIn-Energy': true, voidService: true, gasMeterReading: 'string', gasMeterReadingDate: 'string', electricMeterReading: 'string', electricMeterReading_2: 'string', electricMeterReadingDate: 'string', waterMeterReading: 'string', waterMeterReadingDate: 'string' };
+  var tenancyStart = { startElectricityReading: { meterReading1: 'string', meterReading2: 'string', meterReadingDate: 'string' }, startGasReading: { meterReading: 'string', meterReadingDate: 'string' }, startWaterReading: { meterReading: 'string', meterReadingDate: 'string' } };
+  var tenancyEnd = { tenancyEnd: 'string', propertyId: 0, sendCouncilAndUtilityNotifications: true, whoIsResponsibleForTheVoidPeriod: 'string', voidBillCorrespondenceAddress: 'string', isFurnished: true, areAnyBillsIncludedInTheRent: bills, 'tenantServiceOptIn-Media': true, 'tenantServiceOptIn-Energy': true, voidService: true, stillManageTheProperty: true, endElectricityReading: { meterReading1: 'string', meterReading2: 'string', meterReadingDate: 'string' }, endGasReading: { meterReading: 'string', meterReadingDate: 'string' }, endWaterReading: { meterReading: 'string', meterReadingDate: 'string' }, forwardingAddress: address };
+  var property = { id: 0, landlordId: 0, address: address, UPRN: 'string', council: 'string', waterSupplier: 'string', councilTaxBand: 'string', councilAnnualCost: 'string', councilMonthlyCost: 'string', gas: { isGasAvailable: true, hasGasSmartMeter: true, hasGasPrePayment: true, meterSerialNumber: 'string', MPRN: 0, supplier: 'string' }, electric: { hasPrePayment: true, hasSmartMeter: true, isEconomy7: true, meterSerialNumber: 'string', MPAN: 0, supplier: 'string' } };
+  var tenancyFull = { id: 0, tenancyStart: 'string', tenancyEnd: 'string', numberOfTenants: 0, isFurnished: true, isStudentLet: true, sendCouncilAndUtilityNotifications: true, whoIsResponsibleForTheVoidPeriod: 'string', voidBillCorrespondenceAddress: 'string', areAnyBillsIncludedInTheRent: bills, address: address, electricity: { isPrePay: true, hasSmartMeter: true, serialNumber: 'string', MPAN: 'string', isEconomy7: true, supplier: 'string', startElectricityReading: { meterReading1: 'string', meterReading2: 0, meterReadingDate: 'string' }, endElectricityReading: { meterReading1: 'string', meterReading2: 'string' } }, gas: { isPrePay: true, hasSmartMeter: true, serialNumber: 'string', MPRN: 'string', supplier: 'string', startGasReading: { meterReading: 'string', meterReadingDate: 'string' }, endGasReading: { meterReading: 'string' } }, water: { serialNumber: 'string', startWaterReading: { reading: 'string', meterReadingDate: 'string' }, endWaterReading: { meterReading: 'string', meterReadingDate: 'string' } }, tenants: [ Object.assign({ id: 0 }, addTenant) ] };
 
   var EP = [
-    { m: 'POST', p: '/landlords', d: 'Create a landlord', n: 'Create the landlord first. Keep the returned resultId as the landlordId for the property.', req: landlord, res: ok },
-    { m: 'PUT', p: '/landlords/{id}', d: 'Correct landlord details', n: 'Send the full landlord record with the corrections.', req: landlord, res: ok },
-    { m: 'POST', p: '/properties', d: 'Create a property', n: 'Muuvo starts matching the council, suppliers and meters as soon as the property is created.', req: { landlordId: 18342, address: address }, res: ok },
+    { m: 'POST', p: '/landlords', d: 'Create a landlord', n: 'Create the landlord first. Keep the returned resultId as the landlordId for the property.', req: addLandlord, res: ok },
+    { m: 'PUT', p: '/landlords/{id}', d: 'Correct landlord details', n: 'Send the full landlord record with the corrections.', req: addLandlord, res: ok },
+    { m: 'POST', p: '/properties', d: 'Create a property', n: 'Muuvo starts matching the council, suppliers and meters as soon as the property is created.', req: addProperty, res: ok },
     { m: 'GET', p: '/properties/{id}', d: 'Read utility and council data', n: 'Usually populated straight away. If the address needs manual meter matching, allow up to two hours.', res: property },
-    { m: 'PUT', p: '/properties/{id}', d: 'Correct a property', n: 'Use this to correct the address or landlord rather than creating a new property.', req: { landlordId: 18342, address: address }, res: ok },
-    { m: 'POST', p: '/tenancies', d: 'Create a pre-tenancy', n: 'Send as soon as references are passed. Dates are sent as DD-MM-YYYY. Use the builder below to generate this body.', req: pre, res: ok },
+    { m: 'PUT', p: '/properties/{id}', d: 'Correct a property', n: 'Use this to correct the address or landlord rather than creating a new property.', req: addProperty, res: ok },
+    { m: 'POST', p: '/tenancies', d: 'Create a pre-tenancy', n: 'Send as soon as references are passed. Dates are sent as DD-MM-YYYY. Use the builder below to generate this body.', req: preTenancy, res: ok },
     { m: 'GET', p: '/tenancies/{id}', d: 'Read the full tenancy', n: 'Returns the tenancy, meters with readings, and tenants. Dates come back as YYYY-MM-DD.', res: tenancyFull },
-    { m: 'PUT', p: '/tenancies/{id}', d: 'Update or correct a tenancy', n: 'Use the stored tenancy ID for any change. Posting again would create a duplicate.', req: pre, res: ok },
+    { m: 'PUT', p: '/tenancies/{id}', d: 'Update or correct a tenancy', n: 'Use the stored tenancy ID for any change. Posting again would create a duplicate.', req: preTenancy, res: ok },
     { m: 'DELETE', p: '/tenancies/{id}', d: 'Remove a tenancy', n: 'Removes the tenancy. Landlords and properties cannot be deleted through the API.' },
-    { m: 'POST', p: '/tenancies/{id}/tenants', d: 'Add a tenant', n: 'Call once for each tenant on the tenancy.', req: tenant, res: ok },
-    { m: 'POST', p: '/tenancies/{id}/tenants/{tenantId}', d: 'Update a tenant', n: 'Note this update uses POST, not PUT.', req: tenant, res: ok },
-    { m: 'POST', p: '/tenancies/{id}/start', d: 'Send move-in readings', n: 'Once the check-in inventory is done. Aim for within five days of move-in: the later the readings, the more likely billing issues become. meterReading2 is only needed for Economy 7 meters.', req: startReads, res: ok },
-    { m: 'POST', p: '/tenancies/{id}/end', d: 'Give notice, then closing readings', n: 'Call it twice. First as soon as notice is given, without readings. Then again on move-out with closing readings and the forwarding address.', req: endNotice, req2: endMoveOut, res: ok },
-    { m: 'POST', p: '/updateForwardingAddress/{id}', d: 'Update the forwarding address', n: 'Use this if the forwarding address changes after the end of tenancy has been sent.', req: { forwardingAddress: endMoveOut.forwardingAddress }, res: ok }
+    { m: 'POST', p: '/tenancies/{id}/tenants', d: 'Add a tenant', n: 'Call once for each tenant on the tenancy.', req: addTenant, res: ok },
+    { m: 'POST', p: '/tenancies/{id}/tenants/{tenantId}', d: 'Update a tenant', n: 'Note this update uses POST, not PUT.', req: addTenant, res: ok },
+    { m: 'POST', p: '/tenancies/{id}/start', d: 'Send move-in readings', n: 'Once the check-in inventory is done. Aim for within five days of move-in: the later the readings, the more likely billing issues become. meterReading2 is only needed for Economy 7 meters.', req: tenancyStart, res: ok },
+    { m: 'POST', p: '/tenancies/{id}/end', d: 'Give notice, then closing readings', n: 'Call it twice. First as soon as notice is given, when the readings and forwarding address can be left empty. Then again on move-out with the closing readings and the forwarding address.', req: tenancyEnd, res: ok },
+    { m: 'POST', p: '/updateForwardingAddress/{id}', d: 'Update the forwarding address', n: 'Use this if the forwarding address changes after the end of tenancy has been sent.', req: { forwardingAddress: address }, res: ok }
   ];
   var cls = { GET: 'm-get', POST: 'm-post', PUT: 'm-put', DELETE: 'm-del' };
   var host = document.getElementById('endpoints');
   if (host) {
     host.innerHTML = EP.map(function (e, i) {
       var body = '<p>' + esc(e.n) + '</p>';
-      if (e.req2) {
-        body += '<h5>Request body: when notice is given</h5>' + codeBlock(e.m + ' ' + e.p, e.req);
-        body += '<h5>Request body: on move-out</h5>' + codeBlock(e.m + ' ' + e.p, e.req2);
-      } else if (e.req) {
-        body += '<h5>Request body</h5>' + codeBlock(e.m + ' ' + e.p, e.req);
-      }
+      if (e.req) body += '<h5>Request body</h5>' + codeBlock(e.m + ' ' + e.p, e.req);
       if (e.res) body += '<h5>Example response</h5>' + codeBlock('200 OK', e.res);
       return '<details class="ep" id="ep-' + i + '"><summary><span class="method ' + cls[e.m] + '">' + e.m + '</span><code>' + esc(e.p) + '</code><span class="ep-desc">' + esc(e.d) + '</span></summary><div class="ep-body">' + body + '</div></details>';
     }).join('');
@@ -688,15 +705,26 @@ mark { background: #fff0c2; color: inherit; border-radius: 2px; }
 
   /* ---------- Payload builder ---------- */
   function buildPayload() {
+    function v(id) { return $(id).value.trim(); }
     var body = {
-      tenancyStart: dmy($('pb-start').value),
-      tenancyEnd: dmy($('pb-end').value),
-      propertyId: Number($('pb-property').value) || 0,
+      tenancyStart: dmy(v('pb-start')),
+      tenancyEnd: dmy(v('pb-end')),
+      propertyId: Number(v('pb-property')) || 0,
       sendCouncilAndUtilityNotifications: $('pb-notify').checked,
+      whoIsResponsibleForTheVoidPeriod: v('pb-who'),
       voidBillCorrespondenceAddress: $('pb-address').value,
       isFurnished: $('pb-furnished').checked,
+      areAnyBillsIncludedInTheRent: { councilTax: $('pb-ct').checked, gas: $('pb-gas').checked, electric: $('pb-elec').checked, water: $('pb-water').checked },
+      'tenantServiceOptIn-Media': $('pb-media').checked,
+      'tenantServiceOptIn-Energy': $('pb-energy').checked,
       voidService: $('pb-void').checked,
-      areAnyBillsIncludedInTheRent: { councilTax: $('pb-ct').checked, gas: $('pb-gas').checked, electric: $('pb-elec').checked, water: $('pb-water').checked }
+      gasMeterReading: v('pb-gasr'),
+      gasMeterReadingDate: dmy(v('pb-gasd')),
+      electricMeterReading: v('pb-elr'),
+      electricMeterReading_2: v('pb-elr2'),
+      electricMeterReadingDate: dmy(v('pb-eld')),
+      waterMeterReading: v('pb-war'),
+      waterMeterReadingDate: dmy(v('pb-wad'))
     };
     $('pb-json').innerHTML = highlight(body);
 
