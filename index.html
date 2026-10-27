@@ -299,6 +299,11 @@ mark { background: var(--mark); color: inherit; border-radius: 2px; }
 .seg button:hover { color: var(--navy); }
 .seg button[aria-pressed="true"] { background: var(--solid); color: var(--on-solid); }
 
+
+/* Journey start switch */
+.journey-switch { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 14px; }
+.seg.seg2 { grid-template-columns: repeat(2, minmax(0, 1fr)); min-width: min(300px, 100%); }
+
 @media (max-width: 900px) {
   .layout { grid-template-columns: minmax(0, 1fr); gap: 18px; }
   nav.toc { position: static; }
@@ -371,7 +376,11 @@ mark { background: var(--mark); color: inherit; border-radius: 2px; }
     <section id="lifecycle">
       <div class="sec-head"><h2>The tenancy lifecycle</h2><span class="sec-label">Overview</span></div>
       <p>Muuvo handles the change of occupier for every tenancy you send: notifying the council and the water and energy suppliers, offering tenants broadband and energy, and switching the property onto a void tariff when tenants leave. Your job is to send each stage at the right moment. We queue everything and release it at the right time.</p>
-      <ol class="timeline">
+      <div class="journey-switch" role="group" aria-label="Where the journey starts">
+        <span class="sec-label">Start the journey from</span>
+        <div class="seg seg2"><button type="button" data-journey-btn="new" aria-pressed="true">New tenancy</button><button type="button" data-journey-btn="end" aria-pressed="false">Notice given</button></div>
+      </div>
+      <ol class="timeline" data-journey="new">
         <li><span class="t-when">References passed</span><span class="t-dot solid"></span><div class="t-what"><b>Send the pre-tenancy</b><span><code>POST /tenancies</code> as soon as references are passed, whether move-in is days or months away.</span></div></li>
         <li><span class="t-when">≤ 2 hours</span><span class="t-dot"></span><div class="t-what"><b>Utility and council data available</b><span>Suppliers, meter serial numbers and MPAN/MPRN are added to the property, usually instantly.</span></div></li>
         <li><span class="t-when">Move-in</span><span class="t-dot solid"></span><div class="t-what"><b>Tenants move in</b><span>Complete the check-in inventory and take meter readings.</span></div></li>
@@ -380,6 +389,18 @@ mark { background: var(--mark); color: inherit; border-radius: 2px; }
         <li><span class="t-when">−5 days</span><span class="t-dot amber"></span><div class="t-what"><b>Void switch released</b><span>Muuvo releases the property to British Gas, our void partner.</span></div></li>
         <li><span class="t-when">Move-out</span><span class="t-dot amber"></span><div class="t-what"><b>Send closing readings</b><span>Call <code>/end</code> again with the closing readings and the tenants' forwarding address.</span></div></li>
         <li><span class="t-when">+30 days</span><span class="t-dot"></span><div class="t-what"><b>Void period covered</b><span>Zero standing charge for 30 days from move-out, plus a £30 bill credit for the landlord.</span></div></li>
+        <li><span class="t-when">Next tenancy</span><span class="t-dot solid"></span><div class="t-what"><b>The cycle continues</b><span>New tenants are referenced and the journey starts again with the next pre-tenancy.</span></div></li>
+      </ol>
+      <ol class="timeline" data-journey="end" hidden>
+        <li><span class="t-when">Notice given</span><span class="t-dot amber"></span><div class="t-what"><b>Send the end of tenancy</b><span><code>POST /tenancies/{id}/end</code> as soon as notice is given, anywhere from around 60 days to more than five days before move-out.</span></div></li>
+        <li><span class="t-when">−5 days</span><span class="t-dot amber"></span><div class="t-what"><b>Void switch processed</b><span>Muuvo releases the property to British Gas, our void partner, so the supply goes live in the landlord's name.</span></div></li>
+        <li><span class="t-when">Move-out</span><span class="t-dot amber"></span><div class="t-what"><b>Bill credit and zero standing charge added</b><span>From move-out day the landlord gets a zero standing charge and a £30 bill credit.</span></div></li>
+        <li><span class="t-when">Move-out</span><span class="t-dot amber"></span><div class="t-what"><b>Send closing readings</b><span>Call <code>/end</code> again with the closing meter readings and the tenants' forwarding address.</span></div></li>
+        <li><span class="t-when">Void period</span><span class="t-dot"></span><div class="t-what"><b>Void period covered</b><span>The zero standing charge runs for up to 30 days while the property is empty.</span></div></li>
+        <li><span class="t-when">References passed</span><span class="t-dot solid"></span><div class="t-what"><b>Send the pre-tenancy</b><span><code>POST /tenancies</code> for the new tenants as soon as references are passed.</span></div></li>
+        <li><span class="t-when">Move-in</span><span class="t-dot solid"></span><div class="t-what"><b>New tenants move in</b><span>Complete the check-in inventory and take meter readings.</span></div></li>
+        <li><span class="t-when">Target +5 days</span><span class="t-dot"></span><div class="t-what"><b>Send the move-in readings</b><span><code>POST /tenancies/{id}/start</code> ideally within five days of move-in. The longer readings wait, the more likely billing issues become.</span></div></li>
+        <li><span class="t-when">Next notice</span><span class="t-dot amber"></span><div class="t-what"><b>The cycle continues</b><span>When these tenants give notice, the journey starts again with the next end of tenancy.</span></div></li>
       </ol>
       <div class="note"><strong>Order doesn't matter</strong><p>An end of tenancy can reach Muuvo before the new tenancy at the same property, or the other way round. Send each piece of data as soon as you have it for the next change of occupancy, and we match them up.</p></div>
     </section>
@@ -716,6 +737,17 @@ mark { background: var(--mark); color: inherit; border-radius: 2px; }
   }
   themeBtns.forEach(function (b) { b.addEventListener('click', function () { setTheme(b.getAttribute('data-theme-btn'), true); }); });
   setTheme(document.documentElement.getAttribute('data-theme') || 'auto', false);
+
+
+  /* ---------- Journey start switch ---------- */
+  var journeyBtns = Array.prototype.slice.call(document.querySelectorAll('[data-journey-btn]'));
+  journeyBtns.forEach(function (b) {
+    b.addEventListener('click', function () {
+      var j = b.getAttribute('data-journey-btn');
+      journeyBtns.forEach(function (x) { x.setAttribute('aria-pressed', String(x === b)); });
+      document.querySelectorAll('ol[data-journey]').forEach(function (ol) { ol.hidden = ol.getAttribute('data-journey') !== j; });
+    });
+  });
 
   /* ---------- Copy buttons (delegated, so generated blocks work too) ---------- */
   document.addEventListener('click', function (e) {
