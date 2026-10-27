@@ -160,13 +160,19 @@ td code { white-space: nowrap; }
 .code .k { color: var(--code-key); }
 .code .s { color: var(--code-str); }
 
-/* Void window, in the report's target-window style */
-.void-bar { display: grid; grid-template-columns: 5fr 1.2fr 30fr; gap: 4px; max-width: 760px; font-size: 0.8rem; }
-.void-bar div { padding: 10px 12px; border-radius: 8px; min-width: 0; }
-.vb-1 { background: var(--amber-soft); color: var(--amber-ink); }
-.vb-2 { background: var(--navy); color: #fff; text-align: center; font-weight: 600; }
-.vb-3 { background: var(--green-soft); color: var(--green); }
-.void-bar b { display: block; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.1em; color: inherit; }
+/* Void window: before and after periods either side of a move-out marker */
+.void-track { display: grid; grid-template-columns: minmax(150px, 1fr) 3px minmax(0, 2.4fr); gap: 0 10px; max-width: 760px; padding-top: 26px; font-size: 0.84rem; }
+.vt-seg { padding: 12px 14px; border-radius: 10px; min-width: 0; line-height: 1.45; }
+.vt-seg b { display: block; font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.12em; color: inherit; margin-bottom: 2px; }
+.vt-pre { background: var(--amber-soft); color: var(--amber-ink); }
+.vt-post { background: var(--green-soft); color: var(--green); }
+.vt-mark { position: relative; background: var(--navy); border-radius: 2px; margin-top: -26px; }
+.vt-mark span { position: absolute; top: 0; left: 50%; transform: translateX(-50%); white-space: nowrap; font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.12em; color: var(--navy); background: var(--surface); padding: 0 6px; line-height: 18px; }
+@media (max-width: 560px) {
+  .void-track { grid-template-columns: minmax(0, 1fr); gap: 10px; padding-top: 0; }
+  .vt-mark { height: 3px; margin: 10px 0; }
+  .vt-mark span { top: 50%; transform: translate(-50%, -50%); }
+}
 
 /* Checklist */
 .check { list-style: none; padding: 0; margin: 0; display: grid; gap: 8px; max-width: 70ch; }
@@ -262,7 +268,6 @@ mark { background: #fff0c2; color: inherit; border-radius: 2px; }
   .t-when { grid-column: 2; grid-row: 1; text-align: left; padding: 0; }
   .t-dot { grid-column: 1; grid-row: 1 / span 2; margin: 4px 0 0; }
   .t-what { grid-column: 2; }
-  .void-bar { grid-template-columns: 1fr; }
 }
 @media (prefers-reduced-motion: no-preference) { html { scroll-behavior: smooth; } }
 </style>
@@ -540,10 +545,10 @@ mark { background: #fff0c2; color: inherit; border-radius: 2px; }
     <section id="void">
       <div class="sec-head"><h2>The void service</h2><span class="sec-label">Service</span></div>
       <p>Between tenancies, the landlord is usually liable for the bills. The void service takes the cost out of that gap. It only works if we know about the move-out early, which is why we ask for the end of tenancy as soon as notice is given.</p>
-      <div class="void-bar" role="img" aria-label="Five days before move-out the switch is released; from move-out a 30 day zero standing charge and a £30 bill credit apply">
-        <div class="vb-1"><b>5 days before</b>Released to British Gas</div>
-        <div class="vb-2">Move-out</div>
-        <div class="vb-3"><b>30 days</b>Zero standing charge and a £30 bill credit for the landlord</div>
+      <div class="void-track" role="img" aria-label="Five days before move-out the property is released to British Gas. For 30 days from move-out the landlord gets a zero standing charge and a £30 bill credit.">
+        <div class="vt-seg vt-pre"><b>5 days before</b>Released to British Gas</div>
+        <div class="vt-mark"><span>Move-out</span></div>
+        <div class="vt-seg vt-post"><b>30 days after</b>Zero standing charge and a £30 bill credit for the landlord</div>
       </div>
       <ul>
         <li>Five days before move-out, we release the property to British Gas, our void partner, so the supply goes live in the landlord's name.</li>
