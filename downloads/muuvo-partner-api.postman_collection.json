@@ -1,0 +1,985 @@
+{
+  "info": {
+    "name": "Muuvo Partner API",
+    "description": "Every partner endpoint, ready to try against staging. Set the apiKey variable to your staging key. Guide: https://developerguide.muuvo.dev/",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "auth": {
+    "type": "apikey",
+    "apikey": [
+      {
+        "key": "key",
+        "value": "X-Muuvo-Key",
+        "type": "string"
+      },
+      {
+        "key": "value",
+        "value": "{{apiKey}}",
+        "type": "string"
+      },
+      {
+        "key": "in",
+        "value": "header",
+        "type": "string"
+      }
+    ]
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "https://agent.muuvostaging.com/services"
+    },
+    {
+      "key": "apiKey",
+      "value": ""
+    }
+  ],
+  "item": [
+    {
+      "name": "Landlords",
+      "item": [
+        {
+          "name": "List all landlords",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/landlords",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "landlords"
+              ],
+              "variable": []
+            },
+            "description": "Returns every landlord on your account."
+          }
+        },
+        {
+          "name": "Create a landlord",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/landlords",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "landlords"
+              ],
+              "variable": []
+            },
+            "description": "Create the landlord first. Keep the returned resultId as the landlordId for the property.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"string\",\n  \"firstName\": \"string\",\n  \"lastName\": \"string\",\n  \"companyName\": \"string\",\n  \"contactNumber\": \"string\",\n  \"email\": \"string\",\n  \"address\": {\n    \"addressLine1\": \"string\",\n    \"addressLine2\": \"string\",\n    \"addressLine3\": \"string\",\n    \"townOrCity\": \"string\",\n    \"county\": \"string\",\n    \"postcode\": \"string\"\n  }\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Get a landlord",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/landlords/:landlordId",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "landlords",
+                ":landlordId"
+              ],
+              "variable": [
+                {
+                  "key": "landlordId",
+                  "value": "0"
+                }
+              ]
+            },
+            "description": "Returns one landlord."
+          }
+        },
+        {
+          "name": "Update a landlord",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/landlords/:landlordId",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "landlords",
+                ":landlordId"
+              ],
+              "variable": [
+                {
+                  "key": "landlordId",
+                  "value": "0"
+                }
+              ]
+            },
+            "description": "Send the full landlord record with the corrections.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"string\",\n  \"firstName\": \"string\",\n  \"lastName\": \"string\",\n  \"companyName\": \"string\",\n  \"contactNumber\": \"string\",\n  \"email\": \"string\",\n  \"address\": {\n    \"addressLine1\": \"string\",\n    \"addressLine2\": \"string\",\n    \"addressLine3\": \"string\",\n    \"townOrCity\": \"string\",\n    \"county\": \"string\",\n    \"postcode\": \"string\"\n  }\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Properties",
+      "item": [
+        {
+          "name": "List all properties",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/properties",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "properties"
+              ],
+              "variable": []
+            },
+            "description": "Returns every property on your account, with utility and council data."
+          }
+        },
+        {
+          "name": "Create a property",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/properties",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "properties"
+              ],
+              "variable": []
+            },
+            "description": "Muuvo starts matching the council, suppliers and meters as soon as the property is created.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"landlordId\": 0,\n  \"address\": {\n    \"addressLine1\": \"string\",\n    \"addressLine2\": \"string\",\n    \"addressLine3\": \"string\",\n    \"townOrCity\": \"string\",\n    \"county\": \"string\",\n    \"postcode\": \"string\"\n  }\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Get utility and council data",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/properties/:propertyId",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "properties",
+                ":propertyId"
+              ],
+              "variable": [
+                {
+                  "key": "propertyId",
+                  "value": "0"
+                }
+              ]
+            },
+            "description": "Usually populated straight away. If the address needs manual meter matching, allow up to two hours."
+          }
+        },
+        {
+          "name": "Update a property",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/properties/:propertyId",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "properties",
+                ":propertyId"
+              ],
+              "variable": [
+                {
+                  "key": "propertyId",
+                  "value": "0"
+                }
+              ]
+            },
+            "description": "Use this to correct the address or landlord rather than creating a new property.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"landlordId\": 0,\n  \"address\": {\n    \"addressLine1\": \"string\",\n    \"addressLine2\": \"string\",\n    \"addressLine3\": \"string\",\n    \"townOrCity\": \"string\",\n    \"county\": \"string\",\n    \"postcode\": \"string\"\n  }\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Tenancies",
+      "item": [
+        {
+          "name": "List all tenancies",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/tenancies",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "tenancies"
+              ],
+              "variable": []
+            },
+            "description": "Returns a summary of every tenancy on your account."
+          }
+        },
+        {
+          "name": "Create a pre-tenancy",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/tenancies",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "tenancies"
+              ],
+              "variable": []
+            },
+            "description": "Send as soon as references are passed. Use the pre-tenancy builder on this page to generate this body.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"tenancyStart\": \"string\",\n  \"tenancyEnd\": \"string\",\n  \"propertyId\": 0,\n  \"sendCouncilAndUtilityNotifications\": true,\n  \"whoIsResponsibleForTheVoidPeriod\": \"string\",\n  \"voidBillCorrespondenceAddress\": \"string\",\n  \"isFurnished\": true,\n  \"areAnyBillsIncludedInTheRent\": {\n    \"councilTax\": true,\n    \"gas\": true,\n    \"electric\": true,\n    \"water\": true\n  },\n  \"tenantServiceOptIn-Media\": true,\n  \"tenantServiceOptIn-Energy\": true,\n  \"voidService\": true,\n  \"gasMeterReading\": \"string\",\n  \"gasMeterReadingDate\": \"string\",\n  \"electricMeterReading\": \"string\",\n  \"electricMeterReading_2\": \"string\",\n  \"electricMeterReadingDate\": \"string\",\n  \"waterMeterReading\": \"string\",\n  \"waterMeterReadingDate\": \"string\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Get the full tenancy",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/tenancies/:tenancyId",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "tenancies",
+                ":tenancyId"
+              ],
+              "variable": [
+                {
+                  "key": "tenancyId",
+                  "value": "0"
+                }
+              ]
+            },
+            "description": "Returns the tenancy, meters with readings, and tenants."
+          }
+        },
+        {
+          "name": "Update a tenancy",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/tenancies/:tenancyId",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "tenancies",
+                ":tenancyId"
+              ],
+              "variable": [
+                {
+                  "key": "tenancyId",
+                  "value": "0"
+                }
+              ]
+            },
+            "description": "Use the stored tenancy ID for any change. Posting again would create a duplicate.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"tenancyStart\": \"string\",\n  \"tenancyEnd\": \"string\",\n  \"propertyId\": 0,\n  \"sendCouncilAndUtilityNotifications\": true,\n  \"whoIsResponsibleForTheVoidPeriod\": \"string\",\n  \"voidBillCorrespondenceAddress\": \"string\",\n  \"isFurnished\": true,\n  \"areAnyBillsIncludedInTheRent\": {\n    \"councilTax\": true,\n    \"gas\": true,\n    \"electric\": true,\n    \"water\": true\n  },\n  \"tenantServiceOptIn-Media\": true,\n  \"tenantServiceOptIn-Energy\": true,\n  \"voidService\": true,\n  \"gasMeterReading\": \"string\",\n  \"gasMeterReadingDate\": \"string\",\n  \"electricMeterReading\": \"string\",\n  \"electricMeterReading_2\": \"string\",\n  \"electricMeterReadingDate\": \"string\",\n  \"waterMeterReading\": \"string\",\n  \"waterMeterReadingDate\": \"string\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Delete a tenancy",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/tenancies/:tenancyId",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "tenancies",
+                ":tenancyId"
+              ],
+              "variable": [
+                {
+                  "key": "tenancyId",
+                  "value": "0"
+                }
+              ]
+            },
+            "description": "Removes the tenancy. Landlords and properties cannot be deleted through the API."
+          }
+        },
+        {
+          "name": "Send move-in readings",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/tenancies/:tenancyId/start",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "tenancies",
+                ":tenancyId",
+                "start"
+              ],
+              "variable": [
+                {
+                  "key": "tenancyId",
+                  "value": "0"
+                }
+              ]
+            },
+            "description": "Once the check-in inventory is done. Aim for within five days of move-in: the later the readings, the more likely billing issues become.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"startElectricityReading\": {\n    \"meterReading1\": \"string\",\n    \"meterReading2\": \"string\",\n    \"meterReadingDate\": \"string\"\n  },\n  \"startGasReading\": {\n    \"meterReading\": \"string\",\n    \"meterReadingDate\": \"string\"\n  },\n  \"startWaterReading\": {\n    \"meterReading\": \"string\",\n    \"meterReadingDate\": \"string\"\n  }\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Give notice, then closing readings",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/tenancies/:tenancyId/end",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "tenancies",
+                ":tenancyId",
+                "end"
+              ],
+              "variable": [
+                {
+                  "key": "tenancyId",
+                  "value": "0"
+                }
+              ]
+            },
+            "description": "Call it twice. First as soon as notice is given, when the readings and forwarding address can be left empty. Then again on move-out with the closing readings and the forwarding address.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"tenancyEnd\": \"string\",\n  \"propertyId\": 0,\n  \"sendCouncilAndUtilityNotifications\": true,\n  \"whoIsResponsibleForTheVoidPeriod\": \"string\",\n  \"voidBillCorrespondenceAddress\": \"string\",\n  \"isFurnished\": true,\n  \"areAnyBillsIncludedInTheRent\": {\n    \"councilTax\": true,\n    \"gas\": true,\n    \"electric\": true,\n    \"water\": true\n  },\n  \"tenantServiceOptIn-Media\": true,\n  \"tenantServiceOptIn-Energy\": true,\n  \"voidService\": true,\n  \"stillManageTheProperty\": true,\n  \"endElectricityReading\": {\n    \"meterReading1\": \"string\",\n    \"meterReading2\": \"string\",\n    \"meterReadingDate\": \"string\"\n  },\n  \"endGasReading\": {\n    \"meterReading\": \"string\",\n    \"meterReadingDate\": \"string\"\n  },\n  \"endWaterReading\": {\n    \"meterReading\": \"string\",\n    \"meterReadingDate\": \"string\"\n  },\n  \"forwardingAddress\": {\n    \"addressLine1\": \"string\",\n    \"addressLine2\": \"string\",\n    \"addressLine3\": \"string\",\n    \"townOrCity\": \"string\",\n    \"county\": \"string\",\n    \"postcode\": \"string\"\n  }\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Update the forwarding address",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/updateForwardingAddress/:tenancyId",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "updateForwardingAddress",
+                ":tenancyId"
+              ],
+              "variable": [
+                {
+                  "key": "tenancyId",
+                  "value": "0"
+                }
+              ]
+            },
+            "description": "Use this if the forwarding address changes after the end of tenancy has been sent.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"forwardingAddress\": {\n    \"addressLine1\": \"string\",\n    \"addressLine2\": \"string\",\n    \"addressLine3\": \"string\",\n    \"townOrCity\": \"string\",\n    \"county\": \"string\",\n    \"postcode\": \"string\"\n  }\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Tenants",
+      "item": [
+        {
+          "name": "List tenants on a tenancy",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/tenancies/:tenancyId/tenants",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "tenancies",
+                ":tenancyId",
+                "tenants"
+              ],
+              "variable": [
+                {
+                  "key": "tenancyId",
+                  "value": "0"
+                }
+              ]
+            },
+            "description": "Returns every tenant on the tenancy."
+          }
+        },
+        {
+          "name": "Add a tenant",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/tenancies/:tenancyId/tenants",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "tenancies",
+                ":tenancyId",
+                "tenants"
+              ],
+              "variable": [
+                {
+                  "key": "tenancyId",
+                  "value": "0"
+                }
+              ]
+            },
+            "description": "Call once for each tenant on the tenancy.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"string\",\n  \"firstName\": \"string\",\n  \"lastName\": \"string\",\n  \"contactNumber\": \"string\",\n  \"email\": \"string\",\n  \"dateOfBirth\": \"string\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Get a tenant",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/tenancies/:tenancyId/tenants/:tenantId",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "tenancies",
+                ":tenancyId",
+                "tenants",
+                ":tenantId"
+              ],
+              "variable": [
+                {
+                  "key": "tenancyId",
+                  "value": "0"
+                },
+                {
+                  "key": "tenantId",
+                  "value": "0"
+                }
+              ]
+            },
+            "description": "Returns one tenant."
+          }
+        },
+        {
+          "name": "Update a tenant",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/tenancies/:tenancyId/tenants/:tenantId",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "tenancies",
+                ":tenancyId",
+                "tenants",
+                ":tenantId"
+              ],
+              "variable": [
+                {
+                  "key": "tenancyId",
+                  "value": "0"
+                },
+                {
+                  "key": "tenantId",
+                  "value": "0"
+                }
+              ]
+            },
+            "description": "Note this update uses POST, not PUT.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"string\",\n  \"firstName\": \"string\",\n  \"lastName\": \"string\",\n  \"contactNumber\": \"string\",\n  \"email\": \"string\",\n  \"dateOfBirth\": \"string\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Delete a tenant",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/tenancies/:tenancyId/tenants/:tenantId",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "tenancies",
+                ":tenancyId",
+                "tenants",
+                ":tenantId"
+              ],
+              "variable": [
+                {
+                  "key": "tenancyId",
+                  "value": "0"
+                },
+                {
+                  "key": "tenantId",
+                  "value": "0"
+                }
+              ]
+            },
+            "description": "Removes the tenant from the tenancy."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Tenant leads",
+      "item": [
+        {
+          "name": "List all tenant leads",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/tenantLeads",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "tenantLeads"
+              ],
+              "variable": []
+            },
+            "description": "Returns every tenant lead on your account."
+          }
+        },
+        {
+          "name": "Create a tenant lead",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/tenantLeads",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "tenantLeads"
+              ],
+              "variable": []
+            },
+            "description": "A tenant to offer Muuvo services to, without any council or utility notifications.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"string\",\n  \"firstName\": \"string\",\n  \"lastName\": \"string\",\n  \"contactNumber\": \"string\",\n  \"email\": \"string\",\n  \"address\": {\n    \"addressLine1\": \"string\",\n    \"addressLine2\": \"string\",\n    \"addressLine3\": \"string\",\n    \"townOrCity\": \"string\",\n    \"county\": \"string\",\n    \"postcode\": \"string\"\n  },\n  \"dateOfBirth\": \"string\",\n  \"moveInDate\": \"string\",\n  \"mediaOptIn\": true,\n  \"energyOptIn\": true\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Get a tenant lead",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/tenantLeads/:id",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "tenantLeads",
+                ":id"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "0"
+                }
+              ]
+            },
+            "description": "Returns one tenant lead, including utility data for the address."
+          }
+        },
+        {
+          "name": "Update a tenant lead",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/tenantLeads/:id",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "tenantLeads",
+                ":id"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "0"
+                }
+              ]
+            },
+            "description": "Send the full lead with the corrections.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"string\",\n  \"firstName\": \"string\",\n  \"lastName\": \"string\",\n  \"contactNumber\": \"string\",\n  \"email\": \"string\",\n  \"address\": {\n    \"addressLine1\": \"string\",\n    \"addressLine2\": \"string\",\n    \"addressLine3\": \"string\",\n    \"townOrCity\": \"string\",\n    \"county\": \"string\",\n    \"postcode\": \"string\"\n  },\n  \"dateOfBirth\": \"string\",\n  \"moveInDate\": \"string\",\n  \"mediaOptIn\": true,\n  \"energyOptIn\": true\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Delete a tenant lead",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/tenantLeads/:id",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "tenantLeads",
+                ":id"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "0"
+                }
+              ]
+            },
+            "description": "Removes the tenant lead."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Home buyers",
+      "item": [
+        {
+          "name": "List all home buyers",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/homeBuyers",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "homeBuyers"
+              ],
+              "variable": []
+            },
+            "description": "Returns every home buyer lead on your account."
+          }
+        },
+        {
+          "name": "Create a home buyer",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/homeBuyers",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "homeBuyers"
+              ],
+              "variable": []
+            },
+            "description": "A buyer from your sales side to offer Muuvo services to before they move in.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"string\",\n  \"firstName\": \"string\",\n  \"lastName\": \"string\",\n  \"contactNumber\": \"string\",\n  \"email\": \"string\",\n  \"address\": {\n    \"addressLine1\": \"string\",\n    \"addressLine2\": \"string\",\n    \"addressLine3\": \"string\",\n    \"townOrCity\": \"string\",\n    \"county\": \"string\",\n    \"postcode\": \"string\"\n  },\n  \"dateOfBirth\": \"string\",\n  \"expectedCompletionDate\": \"string\",\n  \"mediaOptIn\": true,\n  \"energyOptIn\": true\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Get a home buyer",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/homeBuyers/:id",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "homeBuyers",
+                ":id"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "0"
+                }
+              ]
+            },
+            "description": "Returns one home buyer, including utility data for the address."
+          }
+        },
+        {
+          "name": "Update a home buyer",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/homeBuyers/:id",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "homeBuyers",
+                ":id"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "0"
+                }
+              ]
+            },
+            "description": "Send the full home buyer with the corrections.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"string\",\n  \"firstName\": \"string\",\n  \"lastName\": \"string\",\n  \"contactNumber\": \"string\",\n  \"email\": \"string\",\n  \"address\": {\n    \"addressLine1\": \"string\",\n    \"addressLine2\": \"string\",\n    \"addressLine3\": \"string\",\n    \"townOrCity\": \"string\",\n    \"county\": \"string\",\n    \"postcode\": \"string\"\n  },\n  \"dateOfBirth\": \"string\",\n  \"expectedCompletionDate\": \"string\",\n  \"mediaOptIn\": true,\n  \"energyOptIn\": true\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Delete a home buyer",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/homeBuyers/:id",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "homeBuyers",
+                ":id"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "0"
+                }
+              ]
+            },
+            "description": "Removes the home buyer."
+          }
+        }
+      ]
+    }
+  ]
+}

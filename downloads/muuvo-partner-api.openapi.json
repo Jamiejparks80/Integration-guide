@@ -1,0 +1,2505 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "Muuvo Partner API",
+    "version": "1.0",
+    "description": "Partner API for sending tenancies, tenant leads and home buyers to Muuvo. Full guide: https://developerguide.muuvo.dev/"
+  },
+  "servers": [
+    {
+      "url": "https://agent.muuvostaging.com/services",
+      "description": "Staging"
+    },
+    {
+      "url": "https://agent.muuvo.co.uk/services",
+      "description": "Production"
+    }
+  ],
+  "security": [
+    {
+      "muuvoKey": []
+    }
+  ],
+  "tags": [
+    {
+      "name": "Landlords"
+    },
+    {
+      "name": "Properties"
+    },
+    {
+      "name": "Tenancies"
+    },
+    {
+      "name": "Tenants"
+    },
+    {
+      "name": "Tenant leads"
+    },
+    {
+      "name": "Home buyers"
+    }
+  ],
+  "paths": {
+    "/landlords": {
+      "get": {
+        "tags": [
+          "Landlords"
+        ],
+        "summary": "List all landlords",
+        "description": "Returns every landlord on your account.",
+        "operationId": "listAllLandlords",
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Landlord"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Landlords"
+        ],
+        "summary": "Create a landlord",
+        "description": "Create the landlord first. Keep the returned resultId as the landlordId for the property.",
+        "operationId": "createALandlord",
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid inputs"
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AddLandlord"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/landlords/{landlordId}": {
+      "get": {
+        "tags": [
+          "Landlords"
+        ],
+        "summary": "Get a landlord",
+        "description": "Returns one landlord.",
+        "operationId": "getALandlord",
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Landlord"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Landlord not found"
+          }
+        },
+        "parameters": [
+          {
+            "name": "landlordId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ]
+      },
+      "put": {
+        "tags": [
+          "Landlords"
+        ],
+        "summary": "Update a landlord",
+        "description": "Send the full landlord record with the corrections.",
+        "operationId": "updateALandlord",
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid inputs"
+          },
+          "404": {
+            "description": "Invalid landlord ID"
+          }
+        },
+        "parameters": [
+          {
+            "name": "landlordId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AddLandlord"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/properties": {
+      "get": {
+        "tags": [
+          "Properties"
+        ],
+        "summary": "List all properties",
+        "description": "Returns every property on your account, with utility and council data.",
+        "operationId": "listAllProperties",
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Property"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Properties"
+        ],
+        "summary": "Create a property",
+        "description": "Muuvo starts matching the council, suppliers and meters as soon as the property is created.",
+        "operationId": "createAProperty",
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid inputs"
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AddProperty"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/properties/{propertyId}": {
+      "get": {
+        "tags": [
+          "Properties"
+        ],
+        "summary": "Get utility and council data",
+        "description": "Usually populated straight away. If the address needs manual meter matching, allow up to two hours.",
+        "operationId": "getUtilityAndCouncilData",
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Property"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Property not found"
+          }
+        },
+        "parameters": [
+          {
+            "name": "propertyId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ]
+      },
+      "put": {
+        "tags": [
+          "Properties"
+        ],
+        "summary": "Update a property",
+        "description": "Use this to correct the address or landlord rather than creating a new property.",
+        "operationId": "updateAProperty",
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid inputs"
+          },
+          "404": {
+            "description": "Invalid property ID"
+          }
+        },
+        "parameters": [
+          {
+            "name": "propertyId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AddProperty"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/tenancies": {
+      "get": {
+        "tags": [
+          "Tenancies"
+        ],
+        "summary": "List all tenancies",
+        "description": "Returns a summary of every tenancy on your account.",
+        "operationId": "listAllTenancies",
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Tenancy"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Tenancies"
+        ],
+        "summary": "Create a pre-tenancy",
+        "description": "Send as soon as references are passed. Use the pre-tenancy builder on this page to generate this body.",
+        "operationId": "createAPretenancy",
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid inputs"
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PreTenancy"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/tenancies/{tenancyId}": {
+      "get": {
+        "tags": [
+          "Tenancies"
+        ],
+        "summary": "Get the full tenancy",
+        "description": "Returns the tenancy, meters with readings, and tenants.",
+        "operationId": "getTheFullTenancy",
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TenancyCompleteInfo"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Tenancy not found"
+          }
+        },
+        "parameters": [
+          {
+            "name": "tenancyId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ]
+      },
+      "put": {
+        "tags": [
+          "Tenancies"
+        ],
+        "summary": "Update a tenancy",
+        "description": "Use the stored tenancy ID for any change. Posting again would create a duplicate.",
+        "operationId": "updateATenancy",
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid inputs"
+          },
+          "404": {
+            "description": "Invalid tenancy ID"
+          }
+        },
+        "parameters": [
+          {
+            "name": "tenancyId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PreTenancy"
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Tenancies"
+        ],
+        "summary": "Delete a tenancy",
+        "description": "Removes the tenancy. Landlords and properties cannot be deleted through the API.",
+        "operationId": "deleteATenancy",
+        "responses": {
+          "400": {
+            "description": "Invalid ID supplied"
+          },
+          "404": {
+            "description": "Tenancy not found"
+          }
+        },
+        "parameters": [
+          {
+            "name": "tenancyId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ]
+      }
+    },
+    "/tenancies/{tenancyId}/start": {
+      "post": {
+        "tags": [
+          "Tenancies"
+        ],
+        "summary": "Send move-in readings",
+        "description": "Once the check-in inventory is done. Aim for within five days of move-in: the later the readings, the more likely billing issues become.",
+        "operationId": "sendMoveinReadings",
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid inputs"
+          },
+          "404": {
+            "description": "Invalid tenancy ID"
+          }
+        },
+        "parameters": [
+          {
+            "name": "tenancyId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TenancyStart"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/tenancies/{tenancyId}/end": {
+      "post": {
+        "tags": [
+          "Tenancies"
+        ],
+        "summary": "Give notice, then closing readings",
+        "description": "Call it twice. First as soon as notice is given, when the readings and forwarding address can be left empty. Then again on move-out with the closing readings and the forwarding address.",
+        "operationId": "giveNoticeThenClosingReadings",
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid inputs"
+          },
+          "404": {
+            "description": "Invalid tenancy ID"
+          }
+        },
+        "parameters": [
+          {
+            "name": "tenancyId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TenancyEnd"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/updateForwardingAddress/{tenancyId}": {
+      "post": {
+        "tags": [
+          "Tenancies"
+        ],
+        "summary": "Update the forwarding address",
+        "description": "Use this if the forwarding address changes after the end of tenancy has been sent.",
+        "operationId": "updateTheForwardingAddress",
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid inputs"
+          },
+          "404": {
+            "description": "Invalid tenancy ID"
+          }
+        },
+        "parameters": [
+          {
+            "name": "tenancyId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ForwardingAddress"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/tenancies/{tenancyId}/tenants": {
+      "get": {
+        "tags": [
+          "Tenants"
+        ],
+        "summary": "List tenants on a tenancy",
+        "description": "Returns every tenant on the tenancy.",
+        "operationId": "listTenantsOnATenancy",
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Tenant"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "tenancyId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ]
+      },
+      "post": {
+        "tags": [
+          "Tenants"
+        ],
+        "summary": "Add a tenant",
+        "description": "Call once for each tenant on the tenancy.",
+        "operationId": "addATenant",
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid inputs"
+          }
+        },
+        "parameters": [
+          {
+            "name": "tenancyId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AddTenant"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/tenancies/{tenancyId}/tenants/{tenantId}": {
+      "get": {
+        "tags": [
+          "Tenants"
+        ],
+        "summary": "Get a tenant",
+        "description": "Returns one tenant.",
+        "operationId": "getATenant",
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Tenant"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Tenant not found"
+          }
+        },
+        "parameters": [
+          {
+            "name": "tenancyId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          {
+            "name": "tenantId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ]
+      },
+      "post": {
+        "tags": [
+          "Tenants"
+        ],
+        "summary": "Update a tenant",
+        "description": "Note this update uses POST, not PUT.",
+        "operationId": "updateATenant",
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid inputs"
+          },
+          "404": {
+            "description": "Invalid ID"
+          }
+        },
+        "parameters": [
+          {
+            "name": "tenancyId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          {
+            "name": "tenantId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AddTenant"
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Tenants"
+        ],
+        "summary": "Delete a tenant",
+        "description": "Removes the tenant from the tenancy.",
+        "operationId": "deleteATenant",
+        "responses": {
+          "400": {
+            "description": "Invalid ID supplied"
+          },
+          "404": {
+            "description": "Tenant not found"
+          }
+        },
+        "parameters": [
+          {
+            "name": "tenancyId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          {
+            "name": "tenantId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ]
+      }
+    },
+    "/tenantLeads": {
+      "get": {
+        "tags": [
+          "Tenant leads"
+        ],
+        "summary": "List all tenant leads",
+        "description": "Returns every tenant lead on your account.",
+        "operationId": "listAllTenantLeads",
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/TenantLead"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Tenant leads"
+        ],
+        "summary": "Create a tenant lead",
+        "description": "A tenant to offer Muuvo services to, without any council or utility notifications.",
+        "operationId": "createATenantLead",
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid inputs"
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AddTenantLead"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/tenantLeads/{id}": {
+      "get": {
+        "tags": [
+          "Tenant leads"
+        ],
+        "summary": "Get a tenant lead",
+        "description": "Returns one tenant lead, including utility data for the address.",
+        "operationId": "getATenantLead",
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TenantLead"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Tenant lead not found"
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ]
+      },
+      "put": {
+        "tags": [
+          "Tenant leads"
+        ],
+        "summary": "Update a tenant lead",
+        "description": "Send the full lead with the corrections.",
+        "operationId": "updateATenantLead",
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid inputs"
+          },
+          "404": {
+            "description": "Invalid ID"
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AddTenantLead"
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Tenant leads"
+        ],
+        "summary": "Delete a tenant lead",
+        "description": "Removes the tenant lead.",
+        "operationId": "deleteATenantLead",
+        "responses": {
+          "400": {
+            "description": "Invalid ID supplied"
+          },
+          "404": {
+            "description": "Tenant lead not found"
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ]
+      }
+    },
+    "/homeBuyers": {
+      "get": {
+        "tags": [
+          "Home buyers"
+        ],
+        "summary": "List all home buyers",
+        "description": "Returns every home buyer lead on your account.",
+        "operationId": "listAllHomeBuyers",
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/HomeBuyer"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Home buyers"
+        ],
+        "summary": "Create a home buyer",
+        "description": "A buyer from your sales side to offer Muuvo services to before they move in.",
+        "operationId": "createAHomeBuyer",
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid inputs"
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AddHomeBuyer"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/homeBuyers/{id}": {
+      "get": {
+        "tags": [
+          "Home buyers"
+        ],
+        "summary": "Get a home buyer",
+        "description": "Returns one home buyer, including utility data for the address.",
+        "operationId": "getAHomeBuyer",
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HomeBuyer"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Home buyer not found"
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ]
+      },
+      "put": {
+        "tags": [
+          "Home buyers"
+        ],
+        "summary": "Update a home buyer",
+        "description": "Send the full home buyer with the corrections.",
+        "operationId": "updateAHomeBuyer",
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid inputs"
+          },
+          "404": {
+            "description": "Invalid ID"
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AddHomeBuyer"
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Home buyers"
+        ],
+        "summary": "Delete a home buyer",
+        "description": "Removes the home buyer.",
+        "operationId": "deleteAHomeBuyer",
+        "responses": {
+          "400": {
+            "description": "Invalid ID supplied"
+          },
+          "404": {
+            "description": "Home buyer not found"
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ]
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "muuvoKey": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "X-Muuvo-Key"
+      }
+    },
+    "schemas": {
+      "APIResponse": {
+        "type": "object",
+        "properties": {
+          "resultCode": {
+            "type": "string"
+          },
+          "resultId": {
+            "type": "integer",
+            "format": "int64",
+            "description": "The ID of the record created or updated."
+          },
+          "Errors": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "description": "Problems with the request, if any."
+            }
+          }
+        }
+      },
+      "Address": {
+        "type": "object",
+        "properties": {
+          "addressLine1": {
+            "type": "string"
+          },
+          "addressLine2": {
+            "type": "string"
+          },
+          "addressLine3": {
+            "type": "string"
+          },
+          "townOrCity": {
+            "type": "string"
+          },
+          "county": {
+            "type": "string"
+          },
+          "postcode": {
+            "type": "string"
+          }
+        }
+      },
+      "AddLandlord": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string"
+          },
+          "firstName": {
+            "type": "string"
+          },
+          "lastName": {
+            "type": "string"
+          },
+          "companyName": {
+            "type": "string"
+          },
+          "contactNumber": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string"
+          },
+          "address": {
+            "type": "object",
+            "properties": {
+              "addressLine1": {
+                "type": "string"
+              },
+              "addressLine2": {
+                "type": "string"
+              },
+              "addressLine3": {
+                "type": "string"
+              },
+              "townOrCity": {
+                "type": "string"
+              },
+              "county": {
+                "type": "string"
+              },
+              "postcode": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      },
+      "Landlord": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "title": {
+            "type": "string"
+          },
+          "firstName": {
+            "type": "string"
+          },
+          "lastName": {
+            "type": "string"
+          },
+          "companyName": {
+            "type": "string"
+          },
+          "contactNumber": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string"
+          },
+          "address": {
+            "type": "object",
+            "properties": {
+              "addressLine1": {
+                "type": "string"
+              },
+              "addressLine2": {
+                "type": "string"
+              },
+              "addressLine3": {
+                "type": "string"
+              },
+              "townOrCity": {
+                "type": "string"
+              },
+              "county": {
+                "type": "string"
+              },
+              "postcode": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      },
+      "AddProperty": {
+        "type": "object",
+        "properties": {
+          "landlordId": {
+            "type": "integer",
+            "format": "int64",
+            "description": "The landlord ID returned by POST /landlords."
+          },
+          "address": {
+            "type": "object",
+            "properties": {
+              "addressLine1": {
+                "type": "string"
+              },
+              "addressLine2": {
+                "type": "string"
+              },
+              "addressLine3": {
+                "type": "string"
+              },
+              "townOrCity": {
+                "type": "string"
+              },
+              "county": {
+                "type": "string"
+              },
+              "postcode": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      },
+      "Property": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "landlordId": {
+            "type": "integer",
+            "format": "int64",
+            "description": "The landlord ID returned by POST /landlords."
+          },
+          "address": {
+            "type": "object",
+            "properties": {
+              "addressLine1": {
+                "type": "string"
+              },
+              "addressLine2": {
+                "type": "string"
+              },
+              "addressLine3": {
+                "type": "string"
+              },
+              "townOrCity": {
+                "type": "string"
+              },
+              "county": {
+                "type": "string"
+              },
+              "postcode": {
+                "type": "string"
+              }
+            }
+          },
+          "UPRN": {
+            "type": "string"
+          },
+          "council": {
+            "type": "string"
+          },
+          "waterSupplier": {
+            "type": "string"
+          },
+          "councilTaxBand": {
+            "type": "string"
+          },
+          "councilAnnualCost": {
+            "type": "string"
+          },
+          "councilMonthlyCost": {
+            "type": "string"
+          },
+          "gas": {
+            "type": "object",
+            "properties": {
+              "isGasAvailable": {
+                "type": "boolean"
+              },
+              "hasGasSmartMeter": {
+                "type": "boolean"
+              },
+              "hasGasPrePayment": {
+                "type": "boolean"
+              },
+              "meterSerialNumber": {
+                "type": "string"
+              },
+              "MPRN": {
+                "type": "number",
+                "description": "Store as text so leading zeros are kept."
+              },
+              "supplier": {
+                "type": "string"
+              }
+            }
+          },
+          "electric": {
+            "type": "object",
+            "properties": {
+              "hasPrePayment": {
+                "type": "boolean"
+              },
+              "hasSmartMeter": {
+                "type": "boolean"
+              },
+              "isEconomy7": {
+                "type": "boolean"
+              },
+              "meterSerialNumber": {
+                "type": "string"
+              },
+              "MPAN": {
+                "type": "number",
+                "description": "Store as text so leading zeros are kept."
+              },
+              "supplier": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      },
+      "PreTenancy": {
+        "type": "object",
+        "properties": {
+          "tenancyStart": {
+            "type": "string",
+            "description": "Send as DD-MM-YYYY. Returned as YYYY-MM-DD."
+          },
+          "tenancyEnd": {
+            "type": "string",
+            "description": "Send as DD-MM-YYYY. Returned as YYYY-MM-DD."
+          },
+          "propertyId": {
+            "type": "integer",
+            "format": "int64",
+            "description": "The property ID returned by POST /properties."
+          },
+          "sendCouncilAndUtilityNotifications": {
+            "type": "boolean",
+            "description": "true: Muuvo notifies the council and suppliers. false: the tenancy is treated as a tenant lead only."
+          },
+          "whoIsResponsibleForTheVoidPeriod": {
+            "type": "string",
+            "enum": [
+              "Landlord",
+              "Property Agent"
+            ],
+            "description": "Landlord or Property Agent."
+          },
+          "voidBillCorrespondenceAddress": {
+            "type": "string",
+            "enum": [
+              "Landlord Address",
+              "Property Agent Address"
+            ],
+            "description": "Landlord Address or Property Agent Address."
+          },
+          "isFurnished": {
+            "type": "boolean"
+          },
+          "areAnyBillsIncludedInTheRent": {
+            "type": "object",
+            "properties": {
+              "councilTax": {
+                "type": "boolean"
+              },
+              "gas": {
+                "type": "boolean"
+              },
+              "electric": {
+                "type": "boolean"
+              },
+              "water": {
+                "type": "boolean"
+              }
+            }
+          },
+          "tenantServiceOptIn-Media": {
+            "type": "boolean"
+          },
+          "tenantServiceOptIn-Energy": {
+            "type": "boolean"
+          },
+          "voidService": {
+            "type": "boolean",
+            "description": "Opts the tenancy into the British Gas void service. Recommended: true."
+          },
+          "gasMeterReading": {
+            "type": "string"
+          },
+          "gasMeterReadingDate": {
+            "type": "string",
+            "description": "Send as DD-MM-YYYY. Returned as YYYY-MM-DD."
+          },
+          "electricMeterReading": {
+            "type": "string"
+          },
+          "electricMeterReading_2": {
+            "type": "string",
+            "description": "Economy 7 meters only."
+          },
+          "electricMeterReadingDate": {
+            "type": "string",
+            "description": "Send as DD-MM-YYYY. Returned as YYYY-MM-DD."
+          },
+          "waterMeterReading": {
+            "type": "string"
+          },
+          "waterMeterReadingDate": {
+            "type": "string",
+            "description": "Send as DD-MM-YYYY. Returned as YYYY-MM-DD."
+          }
+        }
+      },
+      "Tenancy": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "tenancyStart": {
+            "type": "string",
+            "description": "Send as DD-MM-YYYY. Returned as YYYY-MM-DD."
+          },
+          "tenancyEnd": {
+            "type": "string",
+            "description": "Send as DD-MM-YYYY. Returned as YYYY-MM-DD."
+          },
+          "numberOfTenants": {
+            "type": "number"
+          },
+          "isFurnished": {
+            "type": "boolean"
+          },
+          "isStudentLet": {
+            "type": "boolean",
+            "description": "Tells the council it is a student property."
+          },
+          "sendCouncilAndUtilityNotifications": {
+            "type": "boolean",
+            "description": "true: Muuvo notifies the council and suppliers. false: the tenancy is treated as a tenant lead only."
+          },
+          "whoIsResponsibleForTheVoidPeriod": {
+            "type": "string",
+            "enum": [
+              "Landlord",
+              "Property Agent"
+            ],
+            "description": "Landlord or Property Agent."
+          },
+          "voidBillCorrespondenceAddress": {
+            "type": "string",
+            "enum": [
+              "Landlord Address",
+              "Property Agent Address"
+            ],
+            "description": "Landlord Address or Property Agent Address."
+          },
+          "areAnyBillsIncludedInTheRent": {
+            "type": "object",
+            "properties": {
+              "councilTax": {
+                "type": "boolean"
+              },
+              "gas": {
+                "type": "boolean"
+              },
+              "electric": {
+                "type": "boolean"
+              },
+              "water": {
+                "type": "boolean"
+              }
+            }
+          },
+          "address": {
+            "type": "object",
+            "properties": {
+              "addressLine1": {
+                "type": "string"
+              },
+              "addressLine2": {
+                "type": "string"
+              },
+              "addressLine3": {
+                "type": "string"
+              },
+              "townOrCity": {
+                "type": "string"
+              },
+              "county": {
+                "type": "string"
+              },
+              "postcode": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      },
+      "TenancyCompleteInfo": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "tenancyStart": {
+            "type": "string",
+            "description": "Send as DD-MM-YYYY. Returned as YYYY-MM-DD."
+          },
+          "tenancyEnd": {
+            "type": "string",
+            "description": "Send as DD-MM-YYYY. Returned as YYYY-MM-DD."
+          },
+          "numberOfTenants": {
+            "type": "number"
+          },
+          "isFurnished": {
+            "type": "boolean"
+          },
+          "isStudentLet": {
+            "type": "boolean",
+            "description": "Tells the council it is a student property."
+          },
+          "sendCouncilAndUtilityNotifications": {
+            "type": "boolean",
+            "description": "true: Muuvo notifies the council and suppliers. false: the tenancy is treated as a tenant lead only."
+          },
+          "whoIsResponsibleForTheVoidPeriod": {
+            "type": "string",
+            "enum": [
+              "Landlord",
+              "Property Agent"
+            ],
+            "description": "Landlord or Property Agent."
+          },
+          "voidBillCorrespondenceAddress": {
+            "type": "string",
+            "enum": [
+              "Landlord Address",
+              "Property Agent Address"
+            ],
+            "description": "Landlord Address or Property Agent Address."
+          },
+          "areAnyBillsIncludedInTheRent": {
+            "type": "object",
+            "properties": {
+              "councilTax": {
+                "type": "boolean"
+              },
+              "gas": {
+                "type": "boolean"
+              },
+              "electric": {
+                "type": "boolean"
+              },
+              "water": {
+                "type": "boolean"
+              }
+            }
+          },
+          "address": {
+            "type": "object",
+            "properties": {
+              "addressLine1": {
+                "type": "string"
+              },
+              "addressLine2": {
+                "type": "string"
+              },
+              "addressLine3": {
+                "type": "string"
+              },
+              "townOrCity": {
+                "type": "string"
+              },
+              "county": {
+                "type": "string"
+              },
+              "postcode": {
+                "type": "string"
+              }
+            }
+          },
+          "electricity": {
+            "type": "object",
+            "properties": {
+              "isPrePay": {
+                "type": "boolean"
+              },
+              "hasSmartMeter": {
+                "type": "boolean"
+              },
+              "serialNumber": {
+                "type": "string"
+              },
+              "MPAN": {
+                "type": "string",
+                "description": "Store as text so leading zeros are kept."
+              },
+              "isEconomy7": {
+                "type": "boolean"
+              },
+              "supplier": {
+                "type": "string"
+              },
+              "startElectricityReading": {
+                "type": "object",
+                "properties": {
+                  "meterReading1": {
+                    "type": "string"
+                  },
+                  "meterReading2": {
+                    "type": "number",
+                    "description": "Economy 7 meters only."
+                  },
+                  "meterReadingDate": {
+                    "type": "string",
+                    "description": "Send as DD-MM-YYYY. Returned as YYYY-MM-DD."
+                  }
+                }
+              },
+              "endElectricityReading": {
+                "type": "object",
+                "properties": {
+                  "meterReading1": {
+                    "type": "string"
+                  },
+                  "meterReading2": {
+                    "type": "string",
+                    "description": "Economy 7 meters only."
+                  }
+                }
+              }
+            }
+          },
+          "gas": {
+            "type": "object",
+            "properties": {
+              "isPrePay": {
+                "type": "boolean"
+              },
+              "hasSmartMeter": {
+                "type": "boolean"
+              },
+              "serialNumber": {
+                "type": "string"
+              },
+              "MPRN": {
+                "type": "string",
+                "description": "Store as text so leading zeros are kept."
+              },
+              "supplier": {
+                "type": "string"
+              },
+              "startGasReading": {
+                "type": "object",
+                "properties": {
+                  "meterReading": {
+                    "type": "string"
+                  },
+                  "meterReadingDate": {
+                    "type": "string",
+                    "description": "Send as DD-MM-YYYY. Returned as YYYY-MM-DD."
+                  }
+                }
+              },
+              "endGasReading": {
+                "type": "object",
+                "properties": {
+                  "meterReading": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          },
+          "water": {
+            "type": "object",
+            "properties": {
+              "serialNumber": {
+                "type": "string"
+              },
+              "startWaterReading": {
+                "type": "object",
+                "properties": {
+                  "reading": {
+                    "type": "string"
+                  },
+                  "meterReadingDate": {
+                    "type": "string",
+                    "description": "Send as DD-MM-YYYY. Returned as YYYY-MM-DD."
+                  }
+                }
+              },
+              "endWaterReading": {
+                "type": "object",
+                "properties": {
+                  "meterReading": {
+                    "type": "string"
+                  },
+                  "meterReadingDate": {
+                    "type": "string",
+                    "description": "Send as DD-MM-YYYY. Returned as YYYY-MM-DD."
+                  }
+                }
+              }
+            }
+          },
+          "tenants": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "integer",
+                  "format": "int64"
+                },
+                "title": {
+                  "type": "string"
+                },
+                "firstName": {
+                  "type": "string"
+                },
+                "lastName": {
+                  "type": "string"
+                },
+                "contactNumber": {
+                  "type": "string"
+                },
+                "email": {
+                  "type": "string"
+                },
+                "dateOfBirth": {
+                  "type": "string",
+                  "description": "Send as DD-MM-YYYY. Returned as YYYY-MM-DD."
+                }
+              }
+            }
+          }
+        }
+      },
+      "TenancyStart": {
+        "type": "object",
+        "properties": {
+          "startElectricityReading": {
+            "type": "object",
+            "properties": {
+              "meterReading1": {
+                "type": "string"
+              },
+              "meterReading2": {
+                "type": "string",
+                "description": "Economy 7 meters only."
+              },
+              "meterReadingDate": {
+                "type": "string",
+                "description": "Send as DD-MM-YYYY. Returned as YYYY-MM-DD."
+              }
+            }
+          },
+          "startGasReading": {
+            "type": "object",
+            "properties": {
+              "meterReading": {
+                "type": "string"
+              },
+              "meterReadingDate": {
+                "type": "string",
+                "description": "Send as DD-MM-YYYY. Returned as YYYY-MM-DD."
+              }
+            }
+          },
+          "startWaterReading": {
+            "type": "object",
+            "properties": {
+              "meterReading": {
+                "type": "string"
+              },
+              "meterReadingDate": {
+                "type": "string",
+                "description": "Send as DD-MM-YYYY. Returned as YYYY-MM-DD."
+              }
+            }
+          }
+        }
+      },
+      "TenancyEnd": {
+        "type": "object",
+        "properties": {
+          "tenancyEnd": {
+            "type": "string",
+            "description": "Send as DD-MM-YYYY. Returned as YYYY-MM-DD."
+          },
+          "propertyId": {
+            "type": "integer",
+            "format": "int64",
+            "description": "The property ID returned by POST /properties."
+          },
+          "sendCouncilAndUtilityNotifications": {
+            "type": "boolean",
+            "description": "true: Muuvo notifies the council and suppliers. false: the tenancy is treated as a tenant lead only."
+          },
+          "whoIsResponsibleForTheVoidPeriod": {
+            "type": "string",
+            "enum": [
+              "Landlord",
+              "Property Agent"
+            ],
+            "description": "Landlord or Property Agent."
+          },
+          "voidBillCorrespondenceAddress": {
+            "type": "string",
+            "enum": [
+              "Landlord Address",
+              "Property Agent Address"
+            ],
+            "description": "Landlord Address or Property Agent Address."
+          },
+          "isFurnished": {
+            "type": "boolean"
+          },
+          "areAnyBillsIncludedInTheRent": {
+            "type": "object",
+            "properties": {
+              "councilTax": {
+                "type": "boolean"
+              },
+              "gas": {
+                "type": "boolean"
+              },
+              "electric": {
+                "type": "boolean"
+              },
+              "water": {
+                "type": "boolean"
+              }
+            }
+          },
+          "tenantServiceOptIn-Media": {
+            "type": "boolean"
+          },
+          "tenantServiceOptIn-Energy": {
+            "type": "boolean"
+          },
+          "voidService": {
+            "type": "boolean",
+            "description": "Opts the tenancy into the British Gas void service. Recommended: true."
+          },
+          "stillManageTheProperty": {
+            "type": "boolean"
+          },
+          "endElectricityReading": {
+            "type": "object",
+            "properties": {
+              "meterReading1": {
+                "type": "string"
+              },
+              "meterReading2": {
+                "type": "string",
+                "description": "Economy 7 meters only."
+              },
+              "meterReadingDate": {
+                "type": "string",
+                "description": "Send as DD-MM-YYYY. Returned as YYYY-MM-DD."
+              }
+            }
+          },
+          "endGasReading": {
+            "type": "object",
+            "properties": {
+              "meterReading": {
+                "type": "string"
+              },
+              "meterReadingDate": {
+                "type": "string",
+                "description": "Send as DD-MM-YYYY. Returned as YYYY-MM-DD."
+              }
+            }
+          },
+          "endWaterReading": {
+            "type": "object",
+            "properties": {
+              "meterReading": {
+                "type": "string"
+              },
+              "meterReadingDate": {
+                "type": "string",
+                "description": "Send as DD-MM-YYYY. Returned as YYYY-MM-DD."
+              }
+            }
+          },
+          "forwardingAddress": {
+            "type": "object",
+            "properties": {
+              "addressLine1": {
+                "type": "string"
+              },
+              "addressLine2": {
+                "type": "string"
+              },
+              "addressLine3": {
+                "type": "string"
+              },
+              "townOrCity": {
+                "type": "string"
+              },
+              "county": {
+                "type": "string"
+              },
+              "postcode": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      },
+      "ForwardingAddress": {
+        "type": "object",
+        "properties": {
+          "forwardingAddress": {
+            "type": "object",
+            "properties": {
+              "addressLine1": {
+                "type": "string"
+              },
+              "addressLine2": {
+                "type": "string"
+              },
+              "addressLine3": {
+                "type": "string"
+              },
+              "townOrCity": {
+                "type": "string"
+              },
+              "county": {
+                "type": "string"
+              },
+              "postcode": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      },
+      "AddTenant": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string"
+          },
+          "firstName": {
+            "type": "string"
+          },
+          "lastName": {
+            "type": "string"
+          },
+          "contactNumber": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string"
+          },
+          "dateOfBirth": {
+            "type": "string",
+            "description": "Send as DD-MM-YYYY. Returned as YYYY-MM-DD."
+          }
+        }
+      },
+      "Tenant": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "title": {
+            "type": "string"
+          },
+          "firstName": {
+            "type": "string"
+          },
+          "lastName": {
+            "type": "string"
+          },
+          "contactNumber": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string"
+          },
+          "dateOfBirth": {
+            "type": "string",
+            "description": "Send as DD-MM-YYYY. Returned as YYYY-MM-DD."
+          }
+        }
+      },
+      "AddTenantLead": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string"
+          },
+          "firstName": {
+            "type": "string"
+          },
+          "lastName": {
+            "type": "string"
+          },
+          "contactNumber": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string"
+          },
+          "address": {
+            "type": "object",
+            "properties": {
+              "addressLine1": {
+                "type": "string"
+              },
+              "addressLine2": {
+                "type": "string"
+              },
+              "addressLine3": {
+                "type": "string"
+              },
+              "townOrCity": {
+                "type": "string"
+              },
+              "county": {
+                "type": "string"
+              },
+              "postcode": {
+                "type": "string"
+              }
+            }
+          },
+          "dateOfBirth": {
+            "type": "string",
+            "description": "Send as DD-MM-YYYY. Returned as YYYY-MM-DD."
+          },
+          "moveInDate": {
+            "type": "string",
+            "description": "Send as DD-MM-YYYY. Returned as YYYY-MM-DD."
+          },
+          "mediaOptIn": {
+            "type": "boolean",
+            "description": "The lead has opted in to media offers."
+          },
+          "energyOptIn": {
+            "type": "boolean",
+            "description": "The lead has opted in to energy offers."
+          }
+        }
+      },
+      "TenantLead": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "title": {
+            "type": "string"
+          },
+          "firstName": {
+            "type": "string"
+          },
+          "lastName": {
+            "type": "string"
+          },
+          "contactNumber": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string"
+          },
+          "address": {
+            "type": "object",
+            "properties": {
+              "addressLine1": {
+                "type": "string"
+              },
+              "addressLine2": {
+                "type": "string"
+              },
+              "addressLine3": {
+                "type": "string"
+              },
+              "townOrCity": {
+                "type": "string"
+              },
+              "county": {
+                "type": "string"
+              },
+              "postcode": {
+                "type": "string"
+              }
+            }
+          },
+          "council": {
+            "type": "string"
+          },
+          "waterSupplier": {
+            "type": "string"
+          },
+          "hasGas": {
+            "type": "boolean"
+          },
+          "gas": {
+            "type": "object",
+            "properties": {
+              "gasSupplier": {
+                "type": "string"
+              },
+              "meterSerialNumber": {
+                "type": "string"
+              },
+              "MPRN": {
+                "type": "number",
+                "description": "Store as text so leading zeros are kept."
+              },
+              "hasGasSmartMeter": {
+                "type": "boolean"
+              },
+              "hasGasPrePayment": {
+                "type": "boolean"
+              }
+            }
+          },
+          "electric": {
+            "type": "object",
+            "properties": {
+              "electricSupplier": {
+                "type": "string"
+              },
+              "meterSerialNumber": {
+                "type": "string"
+              },
+              "MPAN": {
+                "type": "string",
+                "description": "Store as text so leading zeros are kept."
+              },
+              "hasSmartMeter": {
+                "type": "boolean"
+              },
+              "isPrePay": {
+                "type": "boolean"
+              }
+            }
+          },
+          "dateofBirth": {
+            "type": "string",
+            "description": "Returned with a lower-case b. Send it as dateOfBirth."
+          },
+          "moveInDate": {
+            "type": "string",
+            "description": "Send as DD-MM-YYYY. Returned as YYYY-MM-DD."
+          },
+          "mediaOptIn": {
+            "type": "boolean",
+            "description": "The lead has opted in to media offers."
+          },
+          "energyOptIn": {
+            "type": "boolean",
+            "description": "The lead has opted in to energy offers."
+          }
+        }
+      },
+      "AddHomeBuyer": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string"
+          },
+          "firstName": {
+            "type": "string"
+          },
+          "lastName": {
+            "type": "string"
+          },
+          "contactNumber": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string"
+          },
+          "address": {
+            "type": "object",
+            "properties": {
+              "addressLine1": {
+                "type": "string"
+              },
+              "addressLine2": {
+                "type": "string"
+              },
+              "addressLine3": {
+                "type": "string"
+              },
+              "townOrCity": {
+                "type": "string"
+              },
+              "county": {
+                "type": "string"
+              },
+              "postcode": {
+                "type": "string"
+              }
+            }
+          },
+          "dateOfBirth": {
+            "type": "string",
+            "description": "Send as DD-MM-YYYY. Returned as YYYY-MM-DD."
+          },
+          "expectedCompletionDate": {
+            "type": "string",
+            "description": "Send as DD-MM-YYYY. Returned as YYYY-MM-DD."
+          },
+          "mediaOptIn": {
+            "type": "boolean",
+            "description": "The lead has opted in to media offers."
+          },
+          "energyOptIn": {
+            "type": "boolean",
+            "description": "The lead has opted in to energy offers."
+          }
+        }
+      },
+      "HomeBuyer": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "title": {
+            "type": "string"
+          },
+          "firstName": {
+            "type": "string"
+          },
+          "lastName": {
+            "type": "string"
+          },
+          "contactNumber": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string"
+          },
+          "address": {
+            "type": "object",
+            "properties": {
+              "addressLine1": {
+                "type": "string"
+              },
+              "addressLine2": {
+                "type": "string"
+              },
+              "addressLine3": {
+                "type": "string"
+              },
+              "townOrCity": {
+                "type": "string"
+              },
+              "county": {
+                "type": "string"
+              },
+              "postcode": {
+                "type": "string"
+              }
+            }
+          },
+          "council": {
+            "type": "string"
+          },
+          "waterSupplier": {
+            "type": "string"
+          },
+          "hasGas": {
+            "type": "boolean"
+          },
+          "gas": {
+            "type": "object",
+            "properties": {
+              "gasSupplier": {
+                "type": "string"
+              },
+              "meterSerialNumber": {
+                "type": "string"
+              },
+              "MPRN": {
+                "type": "number",
+                "description": "Store as text so leading zeros are kept."
+              },
+              "hasGasSmartMeter": {
+                "type": "boolean"
+              },
+              "hasGasPrePayment": {
+                "type": "boolean"
+              }
+            }
+          },
+          "electric": {
+            "type": "object",
+            "properties": {
+              "electricSupplier": {
+                "type": "string"
+              },
+              "meterSerialNumber": {
+                "type": "string"
+              },
+              "MPAN": {
+                "type": "string",
+                "description": "Store as text so leading zeros are kept."
+              },
+              "hasSmartMeter": {
+                "type": "boolean"
+              },
+              "isPrePay": {
+                "type": "boolean"
+              }
+            }
+          },
+          "dateofBirth": {
+            "type": "string",
+            "description": "Returned with a lower-case b. Send it as dateOfBirth."
+          },
+          "expectedCompletionDate": {
+            "type": "string",
+            "description": "Send as DD-MM-YYYY. Returned as YYYY-MM-DD."
+          },
+          "mediaOptIn": {
+            "type": "boolean",
+            "description": "The lead has opted in to media offers."
+          },
+          "energyOptIn": {
+            "type": "boolean",
+            "description": "The lead has opted in to energy offers."
+          }
+        }
+      }
+    }
+  }
+}

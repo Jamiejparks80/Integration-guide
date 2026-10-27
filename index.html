@@ -304,6 +304,26 @@ mark { background: var(--mark); color: inherit; border-radius: 2px; }
 .journey-switch { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 14px; }
 .seg.seg2 { grid-template-columns: repeat(2, minmax(0, 1fr)); min-width: min(300px, 100%); }
 
+
+/* Endpoint groups, field tables, response codes, code tabs */
+.ep-groups { display: grid; gap: 10px; }
+.ep-group { margin: 10px 0 0; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.14em; color: var(--muted); font-weight: 600; }
+.ftable { font-size: 0.82rem; }
+.ftable td { padding: 7px 10px 7px 0; }
+.ftable td:first-child { white-space: nowrap; }
+.ftable td:nth-child(2) { color: var(--muted); white-space: nowrap; }
+.pp { font-size: 0.86rem; }
+.rcodes { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; font-size: 0.88rem; }
+.rcodes li { display: flex; gap: 10px; align-items: baseline; margin: 0; }
+.rc { font-family: var(--mono); font-size: 0.72rem; font-weight: 500; padding: 1px 7px; border-radius: 5px; }
+.rc2 { background: var(--green-soft); color: var(--green); }
+.rc4 { background: var(--amber-soft); color: var(--amber-ink); }
+.tabs { display: flex; flex-wrap: wrap; gap: 2px; }
+.tabs button { font-family: var(--font); font-size: 0.74rem; font-weight: 600; color: var(--code-fg); opacity: 0.65; background: transparent; border: 0; border-radius: 6px; padding: 3px 9px; cursor: pointer; }
+.tabs button:hover { opacity: 1; }
+.tabs button[aria-selected="true"] { opacity: 1; background: rgba(255,255,255,0.12); color: var(--code-key); }
+.samples .code-head { flex-wrap: wrap; }
+
 @media (max-width: 900px) {
   .layout { grid-template-columns: minmax(0, 1fr); gap: 18px; }
   nav.toc { position: static; }
@@ -356,17 +376,21 @@ mark { background: var(--mark); color: inherit; border-radius: 2px; }
       <li><a href="#lifecycle">The tenancy lifecycle</a></li>
       <li><a href="#onboarding">Onboarding agencies</a></li>
       <li><a href="#auth">Authentication</a></li>
-      <li><a href="#build">Building a tenancy</a></li>
+      <li><a href="#build">Building a tenancy &amp; endpoints</a></li>
       <li><a href="#builder">Build a pre-tenancy</a></li>
       <li><a href="#fields">Fields that drive the service</a></li>
       <li><a href="#timings">When to send data</a></li>
       <li><a href="#planner">Plan your calls</a></li>
       <li><a href="#void">The void service</a></li>
       <li><a href="#utility">Reading utility &amp; council data</a></li>
+      <li><a href="#leads">Tenant leads and home buyers</a></li>
       <li><a href="#ids">IDs and avoiding duplicates</a></li>
       <li><a href="#status">Status and reporting</a></li>
       <li><a href="#golive">Testing and go-live</a></li>
+      <li><a href="#errors">Responses and errors</a></li>
+      <li><a href="#tools">Downloads and tools</a></li>
       <li><a href="#notes">Technical notes</a></li>
+      <li><a href="#changelog">Changelog</a></li>
     </ol>
   </nav>
 
@@ -463,8 +487,8 @@ mark { background: var(--mark); color: inherit; border-radius: 2px; }
       <div class="note"><strong>Starting from notice given</strong><p>When the journey starts at notice given, Muuvo won't hold the outgoing tenancy. Create the landlord, property and outgoing tenancy (steps 1 to 4), then go straight to step 6.</p></div>
 
       <h3>Endpoint reference</h3>
-      <p>Select an endpoint to see its fields and an example request and response.</p>
-      <div id="endpoints" class="ep-list"></div>
+      <p>Every endpoint available to integration partners, grouped by record. Select one to see its fields, an example request in your language, the possible responses and an example response. Code examples use staging; switch the base URL to production once you have production keys.</p>
+      <div id="endpoints" class="ep-groups"></div>
     </section>
 
     <section id="builder">
@@ -644,6 +668,22 @@ mark { background: var(--mark); color: inherit; border-radius: 2px; }
       <div class="note teal"><strong>Timing</strong><p>This data is usually available straight away. If a property doesn't match the national database, our team maps it to the correct meters manually. This takes up to two hours.</p></div>
     </section>
 
+    <!-- Leads -->
+    <section id="leads">
+      <div class="sec-head"><h2>Tenant leads and home buyers</h2><span class="sec-label">Leads</span></div>
+      <p>Alongside tenancies, you can send Muuvo two kinds of lead. Both are optional; use them if they fit your platform.</p>
+      <div class="table-scroll">
+        <table>
+          <thead><tr><th>Record</th><th>Use it for</th><th>Endpoint</th></tr></thead>
+          <tbody>
+            <tr><td><b>Tenant lead</b></td><td>A tenant Muuvo can offer services to, without any council or utility notifications. It has the same effect as sending a pre-tenancy with <code>sendCouncilAndUtilityNotifications</code> set to <code>false</code>.</td><td><code>/tenantLeads</code></td></tr>
+            <tr><td><b>Home buyer</b></td><td>A buyer from your sales side, so Muuvo can offer services before they move in. Useful if your CRM has a sales or home buyer section.</td><td><code>/homeBuyers</code></td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p>When you read a lead back, Muuvo includes the council, water supplier and meter details for the address, in the same way as for a property.</p>
+    </section>
+
     <!-- IDs -->
     <section id="ids">
       <div class="sec-head"><h2>IDs and avoiding duplicates</h2><span class="sec-label">Data</span></div>
@@ -687,6 +727,38 @@ mark { background: var(--mark); color: inherit; border-radius: 2px; }
       </ul>
     </section>
 
+    <!-- Errors -->
+    <section id="errors">
+      <div class="sec-head"><h2>Responses and errors</h2><span class="sec-label">Reference</span></div>
+      <p>Every create and update returns the same response body. Check the HTTP status first, then the <code>Errors</code> list.</p>
+      <div class="table-scroll">
+        <table>
+          <thead><tr><th>Status</th><th>Meaning</th><th>What to do</th></tr></thead>
+          <tbody>
+            <tr><td><span class="rc rc2">200</span></td><td>Successful operation</td><td>Store the <code>resultId</code> for a create. For a GET, the record or list is in the body.</td></tr>
+            <tr><td><span class="rc rc4">400</span></td><td>Invalid inputs, or an invalid ID</td><td>Read the <code>Errors</code> list, correct the request and send it again.</td></tr>
+            <tr><td><span class="rc rc4">404</span></td><td>Record not found, or the ID does not exist</td><td>Check the ID you stored. Do not create a new record to work around it.</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="note"><strong>Being confirmed</strong><p>The required fields for each create call, example error messages, and the response for a missing or invalid <code>X-Muuvo-Key</code> are being confirmed and will be added here.</p></div>
+    </section>
+
+    <!-- Tools -->
+    <section id="tools">
+      <div class="sec-head"><h2>Downloads and tools</h2><span class="sec-label">Reference</span></div>
+      <p>Everything on this page is also available as files you can load into your own tools. They are generated from the same source as this guide, so they always match it.</p>
+      <div class="table-scroll">
+        <table>
+          <thead><tr><th>File</th><th>Use it to</th></tr></thead>
+          <tbody>
+            <tr><td><a href="downloads/muuvo-partner-api.postman_collection.json" download>Postman collection</a></td><td>Try every endpoint against staging. In Postman choose <b>Import</b>, select the file, then set the <code>apiKey</code> variable to your staging key.</td></tr>
+            <tr><td><a href="downloads/muuvo-partner-api.openapi.json" download>OpenAPI 3.0 spec</a></td><td>Generate a client library in your language, or load the API into tools such as Postman, Insomnia or Swagger UI.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
     <!-- Notes -->
     <section id="notes">
       <div class="sec-head"><h2>Technical notes</h2><span class="sec-label">Reference</span></div>
@@ -697,6 +769,19 @@ mark { background: var(--mark); color: inherit; border-radius: 2px; }
         <li><b>Rate limits.</b> Rate limits apply. Your Muuvo contact will confirm the current limits.</li>
         <li><b>Deletes.</b> Tenancies, tenants, tenant leads and home buyers can be deleted. Landlords and properties can't be deleted through the API; ask us if you need one removed.</li>
       </ul>
+    </section>
+
+    <!-- Changelog -->
+    <section id="changelog">
+      <div class="sec-head"><h2>Changelog</h2><span class="sec-label">Reference</span></div>
+      <div class="table-scroll">
+        <table>
+          <thead><tr><th>Version</th><th>Date</th><th>Changes</th></tr></thead>
+          <tbody>
+            <tr><td><b>1.0</b></td><td>October 2026</td><td>First release of the partner guide, covering landlords, properties, tenancies, tenants, tenant leads and home buyers.</td></tr>
+          </tbody>
+        </table>
+      </div>
     </section>
   </main>
 </div>
@@ -713,6 +798,7 @@ mark { background: var(--mark); color: inherit; border-radius: 2px; }
   </div>
 </footer>
 
+<script src="api/model.js"></script>
 <script>
 (function () {
   function esc(t) { return String(t).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
@@ -754,7 +840,7 @@ mark { background: var(--mark); color: inherit; border-radius: 2px; }
   document.addEventListener('click', function (e) {
     var btn = e.target.closest('[data-copy]');
     if (!btn) return;
-    var pre = btn.closest('.code').querySelector('pre');
+    var pre = btn.closest('.code').querySelector('pre:not([hidden])');
     function done(label) { btn.textContent = label; setTimeout(function () { btn.textContent = 'Copy'; }, 1600); }
     function select() { var r = document.createRange(); r.selectNodeContents(pre); var sel = window.getSelection(); sel.removeAllRanges(); sel.addRange(r); done('Selected'); }
     if (navigator.clipboard && navigator.clipboard.writeText) {
@@ -762,45 +848,144 @@ mark { background: var(--mark); color: inherit; border-radius: 2px; }
     } else { select(); }
   });
 
-  /* ---------- Examples: exactly as generated by the Swagger definitions ---------- */
-  var address = { addressLine1: 'string', addressLine2: 'string', addressLine3: 'string', townOrCity: 'string', county: 'string', postcode: 'string' };
-  var addLandlord = { title: 'string', firstName: 'string', lastName: 'string', companyName: 'string', contactNumber: 'string', email: 'string', address: address };
-  var addProperty = { landlordId: 0, address: address };
-  var addTenant = { title: 'string', firstName: 'string', lastName: 'string', contactNumber: 'string', email: 'string', dateOfBirth: 'string' };
-  var ok = { resultCode: 'string', resultId: 0, Errors: ['string'] };
-  var bills = { councilTax: true, gas: true, electric: true, water: true };
-  var preTenancy = { tenancyStart: 'string', tenancyEnd: 'string', propertyId: 0, sendCouncilAndUtilityNotifications: true, whoIsResponsibleForTheVoidPeriod: 'string', voidBillCorrespondenceAddress: 'string', isFurnished: true, areAnyBillsIncludedInTheRent: bills, 'tenantServiceOptIn-Media': true, 'tenantServiceOptIn-Energy': true, voidService: true, gasMeterReading: 'string', gasMeterReadingDate: 'string', electricMeterReading: 'string', electricMeterReading_2: 'string', electricMeterReadingDate: 'string', waterMeterReading: 'string', waterMeterReadingDate: 'string' };
-  var tenancyStart = { startElectricityReading: { meterReading1: 'string', meterReading2: 'string', meterReadingDate: 'string' }, startGasReading: { meterReading: 'string', meterReadingDate: 'string' }, startWaterReading: { meterReading: 'string', meterReadingDate: 'string' } };
-  var tenancyEnd = { tenancyEnd: 'string', propertyId: 0, sendCouncilAndUtilityNotifications: true, whoIsResponsibleForTheVoidPeriod: 'string', voidBillCorrespondenceAddress: 'string', isFurnished: true, areAnyBillsIncludedInTheRent: bills, 'tenantServiceOptIn-Media': true, 'tenantServiceOptIn-Energy': true, voidService: true, stillManageTheProperty: true, endElectricityReading: { meterReading1: 'string', meterReading2: 'string', meterReadingDate: 'string' }, endGasReading: { meterReading: 'string', meterReadingDate: 'string' }, endWaterReading: { meterReading: 'string', meterReadingDate: 'string' }, forwardingAddress: address };
-  var property = { id: 0, landlordId: 0, address: address, UPRN: 'string', council: 'string', waterSupplier: 'string', councilTaxBand: 'string', councilAnnualCost: 'string', councilMonthlyCost: 'string', gas: { isGasAvailable: true, hasGasSmartMeter: true, hasGasPrePayment: true, meterSerialNumber: 'string', MPRN: 0, supplier: 'string' }, electric: { hasPrePayment: true, hasSmartMeter: true, isEconomy7: true, meterSerialNumber: 'string', MPAN: 0, supplier: 'string' } };
-  var tenancyFull = { id: 0, tenancyStart: 'string', tenancyEnd: 'string', numberOfTenants: 0, isFurnished: true, isStudentLet: true, sendCouncilAndUtilityNotifications: true, whoIsResponsibleForTheVoidPeriod: 'string', voidBillCorrespondenceAddress: 'string', areAnyBillsIncludedInTheRent: bills, address: address, electricity: { isPrePay: true, hasSmartMeter: true, serialNumber: 'string', MPAN: 'string', isEconomy7: true, supplier: 'string', startElectricityReading: { meterReading1: 'string', meterReading2: 0, meterReadingDate: 'string' }, endElectricityReading: { meterReading1: 'string', meterReading2: 'string' } }, gas: { isPrePay: true, hasSmartMeter: true, serialNumber: 'string', MPRN: 'string', supplier: 'string', startGasReading: { meterReading: 'string', meterReadingDate: 'string' }, endGasReading: { meterReading: 'string' } }, water: { serialNumber: 'string', startWaterReading: { reading: 'string', meterReadingDate: 'string' }, endWaterReading: { meterReading: 'string', meterReadingDate: 'string' } }, tenants: [ Object.assign({ id: 0 }, addTenant) ] };
-
-  var EP = [
-    { m: 'POST', p: '/landlords', d: 'Create a landlord', n: 'Create the landlord first. Keep the returned resultId as the landlordId for the property.', req: addLandlord, res: ok },
-    { m: 'PUT', p: '/landlords/{id}', d: 'Correct landlord details', n: 'Send the full landlord record with the corrections.', req: addLandlord, res: ok },
-    { m: 'POST', p: '/properties', d: 'Create a property', n: 'Muuvo starts matching the council, suppliers and meters as soon as the property is created.', req: addProperty, res: ok },
-    { m: 'GET', p: '/properties/{id}', d: 'Read utility and council data', n: 'Usually populated straight away. If the address needs manual meter matching, allow up to two hours.', res: property },
-    { m: 'PUT', p: '/properties/{id}', d: 'Correct a property', n: 'Use this to correct the address or landlord rather than creating a new property.', req: addProperty, res: ok },
-    { m: 'POST', p: '/tenancies', d: 'Create a pre-tenancy', n: 'Send as soon as references are passed. Dates are sent as DD-MM-YYYY. Use the builder below to generate this body.', req: preTenancy, res: ok },
-    { m: 'GET', p: '/tenancies/{id}', d: 'Read the full tenancy', n: 'Returns the tenancy, meters with readings, and tenants. Dates come back as YYYY-MM-DD.', res: tenancyFull },
-    { m: 'PUT', p: '/tenancies/{id}', d: 'Update or correct a tenancy', n: 'Use the stored tenancy ID for any change. Posting again would create a duplicate.', req: preTenancy, res: ok },
-    { m: 'DELETE', p: '/tenancies/{id}', d: 'Remove a tenancy', n: 'Removes the tenancy. Landlords and properties cannot be deleted through the API.' },
-    { m: 'POST', p: '/tenancies/{id}/tenants', d: 'Add a tenant', n: 'Call once for each tenant on the tenancy.', req: addTenant, res: ok },
-    { m: 'POST', p: '/tenancies/{id}/tenants/{tenantId}', d: 'Update a tenant', n: 'Note this update uses POST, not PUT.', req: addTenant, res: ok },
-    { m: 'POST', p: '/tenancies/{id}/start', d: 'Send move-in readings', n: 'Once the check-in inventory is done. Aim for within five days of move-in: the later the readings, the more likely billing issues become. meterReading2 is only needed for Economy 7 meters.', req: tenancyStart, res: ok },
-    { m: 'POST', p: '/tenancies/{id}/end', d: 'Give notice, then closing readings', n: 'Call it twice. First as soon as notice is given, when the readings and forwarding address can be left empty. Then again on move-out with the closing readings and the forwarding address.', req: tenancyEnd, res: ok },
-    { m: 'POST', p: '/updateForwardingAddress/{id}', d: 'Update the forwarding address', n: 'Use this if the forwarding address changes after the end of tenancy has been sent.', req: { forwardingAddress: address }, res: ok }
-  ];
+  /* ---------- Endpoint reference (from api/model.js) ---------- */
+  var API = window.MUUVO_API;
   var cls = { GET: 'm-get', POST: 'm-post', PUT: 'm-put', DELETE: 'm-del' };
+  var LANGS = [['curl', 'curl'], ['js', 'JavaScript'], ['py', 'Python'], ['php', 'PHP'], ['cs', 'C#']];
+
+  function example(ref) {
+    if (!ref) return null;
+    if (Array.isArray(ref)) return [API.schemas[ref[0]]];
+    return API.schemas[ref];
+  }
+  function typeOf(v) {
+    if (Array.isArray(v)) return 'array of ' + (typeof v[0] === 'object' ? 'objects' : v[0] === 'string' ? 'strings' : typeof v[0] + 's');
+    if (v && typeof v === 'object') return 'object';
+    if (typeof v === 'string') return 'string';
+    if (typeof v === 'number') return 'number';
+    return typeof v;
+  }
+  function flatten(obj, prefix, depth, out) {
+    Object.keys(obj).forEach(function (k) {
+      var v = obj[k], path = prefix ? prefix + '.' + k : k;
+      var note = API.notes[path] || API.notes[k] || '';
+      if (API.enums[k]) note = note || API.enums[k].join(' or ') + '.';
+      out.push({ name: k, path: path, type: typeOf(v), note: note, depth: depth });
+      if (Array.isArray(v) && v[0] && typeof v[0] === 'object') flatten(v[0], path + '[]', depth + 1, out);
+      else if (v && typeof v === 'object' && !Array.isArray(v)) flatten(v, path, depth + 1, out);
+    });
+    return out;
+  }
+  function fieldTable(obj) {
+    var root = Array.isArray(obj) ? obj[0] : obj;
+    var rows = flatten(root, '', 0, []);
+    return '<div class="table-scroll"><table class="ftable"><thead><tr><th>Field</th><th>Type</th><th>Notes</th></tr></thead><tbody>' +
+      rows.map(function (r) {
+        return '<tr><td style="padding-left:' + (r.depth * 16) + 'px"><code>' + esc(r.name) + '</code></td><td>' + esc(r.type) + '</td><td>' + esc(r.note) + '</td></tr>';
+      }).join('') + '</tbody></table></div>';
+  }
+  function codesList(c) {
+    return '<ul class="rcodes">' + Object.keys(c).map(function (k) {
+      return '<li><span class="rc rc' + k.charAt(0) + '">' + k + '</span>' + esc(c[k]) + '</li>';
+    }).join('') + '</ul>';
+  }
+
+  /* Code samples */
+  function snake(n) { return n.replace(/[A-Z]/g, function (c) { return '_' + c.toLowerCase(); }); }
+  function params(e, g) {
+    var out = [], re = /\{(\w+)\}/g, m;
+    while ((m = re.exec(e.p))) out.push({ p: m[1], v: m[1] === 'id' ? (API.idNames[g.name] || 'id') : m[1] });
+    return out;
+  }
+  function fill(e, ps, f) { var i = 0; return e.p.replace(/\{(\w+)\}/g, function () { return f(ps[i++].v); }); }
+  function indent(t, n) { var pad = new Array(n + 1).join(' '); return t.split('\n').map(function (l) { return pad + l; }).join('\n'); }
+  function samples(e, g) {
+    var ps = params(e, g), bodyObj = e.req ? example(e.req) : null;
+    var json = bodyObj ? JSON.stringify(bodyObj, null, 2) : null;
+    var hasJson = e.m !== 'DELETE';
+    var s = {};
+
+    // curl
+    var c = (e.m === 'GET' ? 'curl' : 'curl -X ' + e.m) + ' "' + API.servers.staging + e.p + '" \\\n  -H "' + API.authHeader + ': $MUUVO_API_KEY"';
+    if (json) c += ' \\\n  -H "Content-Type: application/json" \\\n  -d \'' + json + '\'';
+    s.curl = c;
+
+    // JavaScript (Node 18+ or browser fetch)
+    var js = "const BASE_URL = '" + API.servers.staging + "';\nconst API_KEY = process.env.MUUVO_API_KEY;\n";
+    ps.forEach(function (x) { js += 'const ' + x.v + ' = 0; // your ' + x.v + '\n'; });
+    if (json) js += '\nconst body = ' + json + ';\n';
+    js += '\nconst response = await fetch(`${BASE_URL}' + fill(e, ps, function (v) { return '${' + v + '}'; }) + '`, {\n  method: \'' + e.m + '\',\n  headers: {\n    \'' + API.authHeader + '\': API_KEY' + (json ? ",\n    'Content-Type': 'application/json'" : '') + '\n  }' + (json ? ',\n  body: JSON.stringify(body)' : '') + '\n});\nif (!response.ok) throw new Error(`Muuvo API error ${response.status}`);\n' + (hasJson ? 'const data = await response.json();\nconsole.log(data);' : 'console.log(response.status);');
+    s.js = js;
+
+    // Python (requests)
+    var py = 'import os\nimport requests\n\nBASE_URL = "' + API.servers.staging + '"\nHEADERS = {"' + API.authHeader + '": os.environ["MUUVO_API_KEY"]}\n';
+    ps.forEach(function (x) { py += snake(x.v) + ' = 0  # your ' + x.v + '\n'; });
+    if (json) py += '\nbody = ' + json.replace(/: true/g, ': True').replace(/: false/g, ': False').replace(/: null/g, ': None') + '\n';
+    py += '\nresponse = requests.' + e.m.toLowerCase() + '(f"{BASE_URL}' + fill(e, ps, function (v) { return '{' + snake(v) + '}'; }) + '", headers=HEADERS' + (json ? ', json=body' : '') + ')\nresponse.raise_for_status()\n' + (hasJson ? 'print(response.json())' : 'print(response.status_code)');
+    s.py = py;
+
+    // PHP (cURL)
+    var php = "<?php\n$baseUrl = '" + API.servers.staging + "';\n$apiKey = getenv('MUUVO_API_KEY');\n";
+    ps.forEach(function (x) { php += '$' + x.v + ' = 0; // your ' + x.v + '\n'; });
+    if (json) php += "\n$body = <<<'JSON'\n" + json + '\nJSON;\n';
+    php += '\n$ch = curl_init("{$baseUrl}' + fill(e, ps, function (v) { return '{$' + v + '}'; }) + '");\ncurl_setopt_array($ch, [\n    CURLOPT_CUSTOMREQUEST => \'' + e.m + '\',\n    CURLOPT_RETURNTRANSFER => true,\n    CURLOPT_HTTPHEADER => [\n        "' + API.authHeader + ': {$apiKey}",' + (json ? "\n        'Content-Type: application/json'," : '') + '\n    ],' + (json ? '\n    CURLOPT_POSTFIELDS => $body,' : '') + '\n]);\n$response = curl_exec($ch);\n$status = curl_getinfo($ch, CURLINFO_HTTP_CODE);\ncurl_close($ch);\n\nif ($status >= 400) {\n    throw new RuntimeException("Muuvo API error {$status}: {$response}");\n}\n' + (hasJson ? 'print_r(json_decode($response, true));' : 'echo $status;');
+    s.php = php;
+
+    // C# (.NET 7+, HttpClient)
+    var rel = fill(e, ps, function (v) { return '{' + v + '}'; }).replace(/^\//, '');
+    var cs = 'using System.Text;\n\nusing var client = new HttpClient { BaseAddress = new Uri("' + API.servers.staging + '/") };\nclient.DefaultRequestHeaders.Add("' + API.authHeader + '", Environment.GetEnvironmentVariable("MUUVO_API_KEY"));\n';
+    ps.forEach(function (x) { cs += 'var ' + x.v + ' = 0; // your ' + x.v + '\n'; });
+    var url = (ps.length ? '$"' : '"') + rel + '"';
+    if (json) cs += '\nvar json = """\n' + indent(json, 4) + '\n    """;\n';
+    var call = { GET: 'GetAsync(' + url + ')', DELETE: 'DeleteAsync(' + url + ')', POST: 'PostAsync(' + url + ',\n    new StringContent(json, Encoding.UTF8, "application/json"))', PUT: 'PutAsync(' + url + ',\n    new StringContent(json, Encoding.UTF8, "application/json"))' }[e.m];
+    cs += '\nvar response = await client.' + call + ';\nresponse.EnsureSuccessStatusCode();\n' + (hasJson ? 'Console.WriteLine(await response.Content.ReadAsStringAsync());' : 'Console.WriteLine((int)response.StatusCode);');
+    s.cs = cs;
+    return s;
+  }
+  function sampleBlock(e, g) {
+    var s = samples(e, g);
+    return '<div class="code samples"><div class="code-head"><div class="tabs" role="tablist">' +
+      LANGS.map(function (l) { return '<button type="button" role="tab" data-lang="' + l[0] + '" aria-selected="false">' + l[1] + '</button>'; }).join('') +
+      '</div><button type="button" data-copy>Copy</button></div>' +
+      LANGS.map(function (l) { return '<pre data-lang="' + l[0] + '" hidden>' + esc(s[l[0]]) + '</pre>'; }).join('') + '</div>';
+  }
+
   var host = document.getElementById('endpoints');
-  if (host) {
-    host.innerHTML = EP.map(function (e, i) {
-      var body = '<p>' + esc(e.n) + '</p>';
-      if (e.req) body += '<h5>Request body</h5>' + codeBlock(e.m + ' ' + e.p, e.req);
-      if (e.res) body += '<h5>Example response</h5>' + codeBlock('200 OK', e.res);
-      return '<details class="ep" id="ep-' + i + '"><summary><span class="method ' + cls[e.m] + '">' + e.m + '</span><code>' + esc(e.p) + '</code><span class="ep-desc">' + esc(e.d) + '</span></summary><div class="ep-body">' + body + '</div></details>';
+  if (host && API) {
+    host.innerHTML = API.groups.map(function (g) {
+      return '<h4 class="ep-group">' + esc(g.name) + '</h4><div class="ep-list">' + g.endpoints.map(function (e) {
+        var body = '<p>' + esc(e.n) + '</p>';
+        var ps = params(e, g);
+        if (ps.length) body += '<h5>Path parameters</h5><p class="pp">' + ps.map(function (x) { return '<code>' + esc(x.p) + '</code> number, required'; }).join('<br>') + '</p>';
+        if (e.req) body += '<h5>Request fields</h5>' + fieldTable(example(e.req)) + '<h5>Request body</h5>' + codeBlock(e.m + ' ' + e.p, example(e.req));
+        body += '<h5>Code example</h5>' + sampleBlock(e, g);
+        body += '<h5>Responses</h5>' + codesList(e.codes);
+        if (e.res) {
+          body += '<h5>Example response</h5>' + codeBlock('200 OK', example(e.res));
+          if (e.m === 'GET') body += '<h5>Response fields</h5>' + fieldTable(example(e.res));
+        }
+        return '<details class="ep"><summary><span class="method ' + cls[e.m] + '">' + e.m + '</span><code>' + esc(e.p) + '</code><span class="ep-desc">' + esc(e.d) + '</span></summary><div class="ep-body">' + body + '</div></details>';
+      }).join('') + '</div>';
     }).join('');
   }
+
+  /* Language tabs: one choice applies to every example and is remembered */
+  function setLang(lang, save) {
+    document.querySelectorAll('.samples').forEach(function (box) {
+      box.querySelectorAll('[data-lang]').forEach(function (el) {
+        var on = el.getAttribute('data-lang') === lang;
+        if (el.tagName === 'PRE') el.hidden = !on; else el.setAttribute('aria-selected', String(on));
+      });
+    });
+    if (save) { try { localStorage.setItem('muuvo-guide-lang', lang); } catch (e) {} }
+  }
+  var savedLang = null;
+  try { savedLang = localStorage.getItem('muuvo-guide-lang'); } catch (e) {}
+  setLang(LANGS.some(function (l) { return l[0] === savedLang; }) ? savedLang : 'curl', false);
+  document.addEventListener('click', function (ev) {
+    var t = ev.target.closest('.tabs [data-lang]');
+    if (t) setLang(t.getAttribute('data-lang'), true);
+  });
 
   /* ---------- Dates ---------- */
   function parse(v) { if (!v) return null; var a = v.split('-'); return new Date(Date.UTC(+a[0], +a[1] - 1, +a[2])); }
