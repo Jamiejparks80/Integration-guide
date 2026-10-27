@@ -392,7 +392,7 @@ mark { background: var(--mark); color: inherit; border-radius: 2px; }
         <li><span class="t-when">Next tenancy</span><span class="t-dot solid"></span><div class="t-what"><b>The cycle continues</b><span>New tenants are referenced and the journey starts again with the next pre-tenancy.</span></div></li>
       </ol>
       <ol class="timeline" data-journey="end" hidden>
-        <li><span class="t-when">Notice given</span><span class="t-dot amber"></span><div class="t-what"><b>Send the end of tenancy</b><span><code>POST /tenancies/{id}/end</code> as soon as notice is given, anywhere from around 60 days to more than five days before move-out.</span></div></li>
+        <li><span class="t-when">Notice given</span><span class="t-dot amber"></span><div class="t-what"><b>Send the end of tenancy</b><span><code>POST /tenancies/{id}/end</code> as soon as notice is given, anywhere from around 60 days to more than five days before move-out. If the outgoing tenancy isn't in Muuvo yet, create the landlord, property and tenancy first, then call <code>/end</code>.</span></div></li>
         <li><span class="t-when">−5 days</span><span class="t-dot amber"></span><div class="t-what"><b>Void switch processed</b><span>Muuvo releases the property to British Gas, our void partner, so the supply goes live in the landlord's name.</span></div></li>
         <li><span class="t-when">Move-out</span><span class="t-dot amber"></span><div class="t-what"><b>Bill credit and zero standing charge added</b><span>From move-out day the landlord gets a zero standing charge and a £30 bill credit.</span></div></li>
         <li><span class="t-when">Move-out</span><span class="t-dot amber"></span><div class="t-what"><b>Send closing readings</b><span>Call <code>/end</code> again with the closing meter readings and the tenants' forwarding address.</span></div></li>
@@ -460,6 +460,7 @@ mark { background: var(--mark); color: inherit; border-radius: 2px; }
         <li><div><b>Start</b><span><code>POST /tenancies/{tenancyId}/start</code> with the move-in readings.</span></div></li>
         <li><div><b>End</b><span><code>POST /tenancies/{tenancyId}/end</code> when notice is given, then again at move-out with closing readings.</span></div></li>
       </ol>
+      <div class="note"><strong>Starting from notice given</strong><p>To join at the end of a tenancy that Muuvo doesn't hold yet, create the landlord, property and outgoing tenancy (steps 1 to 4), then go straight to step 6.</p></div>
 
       <h3>Endpoint reference</h3>
       <p>Select an endpoint to see its fields and an example request and response.</p>
