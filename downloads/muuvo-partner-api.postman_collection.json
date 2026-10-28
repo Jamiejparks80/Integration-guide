@@ -310,7 +310,7 @@
               ],
               "variable": []
             },
-            "description": "Send as soon as references are passed. Use the pre-tenancy builder on this page to generate this body.",
+            "description": "Use it for the outgoing tenancy when notice is given, and for each new tenancy once references are passed. The pre-tenancy builder on this page generates this body.",
             "body": {
               "mode": "raw",
               "raw": "{\n  \"tenancyStart\": \"string\",\n  \"tenancyEnd\": \"string\",\n  \"propertyId\": 0,\n  \"sendCouncilAndUtilityNotifications\": true,\n  \"whoIsResponsibleForTheVoidPeriod\": \"string\",\n  \"voidBillCorrespondenceAddress\": \"string\",\n  \"isFurnished\": true,\n  \"areAnyBillsIncludedInTheRent\": {\n    \"councilTax\": true,\n    \"gas\": true,\n    \"electric\": true,\n    \"water\": true\n  },\n  \"tenantServiceOptIn-Media\": true,\n  \"tenantServiceOptIn-Energy\": true,\n  \"voidService\": true,\n  \"gasMeterReading\": \"string\",\n  \"gasMeterReadingDate\": \"string\",\n  \"electricMeterReading\": \"string\",\n  \"electricMeterReading_2\": \"string\",\n  \"electricMeterReadingDate\": \"string\",\n  \"waterMeterReading\": \"string\",\n  \"waterMeterReadingDate\": \"string\"\n}",
@@ -409,45 +409,6 @@
           }
         },
         {
-          "name": "Send move-in readings",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "url": {
-              "raw": "{{baseUrl}}/tenancies/:tenancyId/start",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "tenancies",
-                ":tenancyId",
-                "start"
-              ],
-              "variable": [
-                {
-                  "key": "tenancyId",
-                  "value": "0"
-                }
-              ]
-            },
-            "description": "Once the check-in inventory is done. Aim for within five days of move-in: the later the readings, the more likely billing issues become.",
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"startElectricityReading\": {\n    \"meterReading1\": \"string\",\n    \"meterReading2\": \"string\",\n    \"meterReadingDate\": \"string\"\n  },\n  \"startGasReading\": {\n    \"meterReading\": \"string\",\n    \"meterReadingDate\": \"string\"\n  },\n  \"startWaterReading\": {\n    \"meterReading\": \"string\",\n    \"meterReadingDate\": \"string\"\n  }\n}",
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
-              }
-            }
-          }
-        },
-        {
           "name": "Give notice, then closing readings",
           "request": {
             "method": "POST",
@@ -478,6 +439,45 @@
             "body": {
               "mode": "raw",
               "raw": "{\n  \"tenancyEnd\": \"string\",\n  \"propertyId\": 0,\n  \"sendCouncilAndUtilityNotifications\": true,\n  \"whoIsResponsibleForTheVoidPeriod\": \"string\",\n  \"voidBillCorrespondenceAddress\": \"string\",\n  \"isFurnished\": true,\n  \"areAnyBillsIncludedInTheRent\": {\n    \"councilTax\": true,\n    \"gas\": true,\n    \"electric\": true,\n    \"water\": true\n  },\n  \"tenantServiceOptIn-Media\": true,\n  \"tenantServiceOptIn-Energy\": true,\n  \"voidService\": true,\n  \"stillManageTheProperty\": true,\n  \"endElectricityReading\": {\n    \"meterReading1\": \"string\",\n    \"meterReading2\": \"string\",\n    \"meterReadingDate\": \"string\"\n  },\n  \"endGasReading\": {\n    \"meterReading\": \"string\",\n    \"meterReadingDate\": \"string\"\n  },\n  \"endWaterReading\": {\n    \"meterReading\": \"string\",\n    \"meterReadingDate\": \"string\"\n  },\n  \"forwardingAddress\": {\n    \"addressLine1\": \"string\",\n    \"addressLine2\": \"string\",\n    \"addressLine3\": \"string\",\n    \"townOrCity\": \"string\",\n    \"county\": \"string\",\n    \"postcode\": \"string\"\n  }\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Send move-in readings",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/tenancies/:tenancyId/start",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "tenancies",
+                ":tenancyId",
+                "start"
+              ],
+              "variable": [
+                {
+                  "key": "tenancyId",
+                  "value": "0"
+                }
+              ]
+            },
+            "description": "Once the check-in inventory is done. Aim for within five days of move-in: the later the readings, the more likely billing issues become.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"startElectricityReading\": {\n    \"meterReading1\": \"string\",\n    \"meterReading2\": \"string\",\n    \"meterReadingDate\": \"string\"\n  },\n  \"startGasReading\": {\n    \"meterReading\": \"string\",\n    \"meterReadingDate\": \"string\"\n  },\n  \"startWaterReading\": {\n    \"meterReading\": \"string\",\n    \"meterReadingDate\": \"string\"\n  }\n}",
               "options": {
                 "raw": {
                   "language": "json"

@@ -300,9 +300,6 @@ mark { background: var(--mark); color: inherit; border-radius: 2px; }
 .seg button[aria-pressed="true"] { background: var(--solid); color: var(--on-solid); }
 
 
-/* Journey start switch */
-.journey-switch { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 14px; }
-.seg.seg2 { grid-template-columns: repeat(2, minmax(0, 1fr)); min-width: min(300px, 100%); }
 
 
 /* Endpoint groups, field tables, response codes, code tabs */
@@ -364,10 +361,10 @@ mark { background: var(--mark); color: inherit; border-radius: 2px; }
       <a class="btn ghost" href="#build">Endpoints and code examples</a>
     </div>
     <div class="stats">
-      <div class="stat"><b>≤ 2 hrs</b><span>Utility data</span><small>usually instant after a property is created</small></div>
-      <div class="stat"><b>5 days</b><span>Move-in readings</span><small>target after move-in; sooner means fewer billing issues</small></div>
-      <div class="stat"><b>5+ days</b><span>Move-out data</span><small>before move-out at the latest; most arrive around 60 days ahead</small></div>
+      <div class="stat"><b>5+ days</b><span>Notice data</span><small>before move-out at the latest; most arrive around 60 days ahead</small></div>
       <div class="stat"><b>30 days</b><span>Void cover</span><small>zero standing charge plus a £30 bill credit for landlords</small></div>
+      <div class="stat"><b>5 days</b><span>Move-in readings</span><small>target after move-in; sooner means fewer billing issues</small></div>
+      <div class="stat"><b>≤ 2 hrs</b><span>Utility data</span><small>usually instant after a property is created</small></div>
     </div>
   </header>
   <div class="meta">
@@ -389,6 +386,7 @@ mark { background: var(--mark); color: inherit; border-radius: 2px; }
     <ol>
       <li><a href="#lifecycle">The tenancy lifecycle</a></li>
       <li><a href="#tools">Downloads and tools</a></li>
+      <li><a href="#void">The void service</a></li>
       <li><a href="#onboarding">Onboarding agencies</a></li>
       <li><a href="#auth">Authentication</a></li>
       <li><a href="#build">Building a tenancy &amp; endpoints</a></li>
@@ -396,7 +394,6 @@ mark { background: var(--mark); color: inherit; border-radius: 2px; }
       <li><a href="#fields">Fields that drive the service</a></li>
       <li><a href="#timings">When to send data</a></li>
       <li><a href="#planner">Plan your calls</a></li>
-      <li><a href="#void">The void service</a></li>
       <li><a href="#utility">Reading utility &amp; council data</a></li>
       <li><a href="#leads">Tenant leads and home buyers</a></li>
       <li><a href="#ids">IDs and avoiding duplicates</a></li>
@@ -414,22 +411,8 @@ mark { background: var(--mark); color: inherit; border-radius: 2px; }
     <section id="lifecycle">
       <div class="sec-head"><h2>The tenancy lifecycle</h2><span class="sec-label">Overview</span></div>
       <p>Muuvo handles the change of occupier for every tenancy you send: notifying the council and the water and energy suppliers, offering tenants broadband and energy, and switching the property onto a void tariff when tenants leave. Your job is to send each stage at the right moment. We queue everything and release it at the right time.</p>
-      <div class="journey-switch" role="group" aria-label="Where the journey starts">
-        <span class="sec-label">Start the journey from</span>
-        <div class="seg seg2"><button type="button" data-journey-btn="new" aria-pressed="true">New tenancy</button><button type="button" data-journey-btn="end" aria-pressed="false">Notice given</button></div>
-      </div>
-      <ol class="timeline" data-journey="new">
-        <li><span class="t-when">References passed</span><span class="t-dot solid"></span><div class="t-what"><b>Send the pre-tenancy</b><span><code>POST /tenancies</code> as soon as references are passed, whether move-in is days or months away.</span></div></li>
-        <li><span class="t-when">≤ 2 hours</span><span class="t-dot"></span><div class="t-what"><b>Utility and council data available</b><span>Suppliers, meter serial numbers and MPAN/MPRN are added to the property, usually instantly.</span></div></li>
-        <li><span class="t-when">Move-in</span><span class="t-dot solid"></span><div class="t-what"><b>Tenants move in</b><span>Complete the check-in inventory and take meter readings.</span></div></li>
-        <li><span class="t-when">Target +5 days</span><span class="t-dot"></span><div class="t-what"><b>Send the move-in readings</b><span><code>POST /tenancies/{id}/start</code> ideally within five days of move-in. The longer readings wait, the more likely billing issues become.</span></div></li>
-        <li><span class="t-when">Notice given</span><span class="t-dot amber"></span><div class="t-what"><b>Send the end of tenancy</b><span><code>POST /tenancies/{id}/end</code> as soon as notice is given, and more than five days before move-out. Most arrive around 60 days ahead.</span></div></li>
-        <li><span class="t-when">−5 days</span><span class="t-dot amber"></span><div class="t-what"><b>Void switch released</b><span>Muuvo releases the property to British Gas, our void partner.</span></div></li>
-        <li><span class="t-when">Move-out</span><span class="t-dot amber"></span><div class="t-what"><b>Send closing readings</b><span>Call <code>/end</code> again with the closing readings and the tenants' forwarding address.</span></div></li>
-        <li><span class="t-when">+30 days</span><span class="t-dot"></span><div class="t-what"><b>Void period covered</b><span>Zero standing charge for 30 days from move-out, plus a £30 bill credit for the landlord.</span></div></li>
-        <li><span class="t-when">Next tenancy</span><span class="t-dot solid"></span><div class="t-what"><b>The cycle continues</b><span>New tenants are referenced and the journey starts again with the next pre-tenancy.</span></div></li>
-      </ol>
-      <ol class="timeline" data-journey="end" hidden>
+      <div class="note teal"><strong>Start at notice given</strong><p>The journey starts when a tenant gives notice. That's where landlords get the most value, with a zero standing charge and a £30 bill credit while the property is empty, and it's where the service earns most. Send the end of tenancy as soon as notice is given.</p></div>
+      <ol class="timeline">
         <li><span class="t-when">Notice given</span><span class="t-dot amber"></span><div class="t-what"><b>Send the end of tenancy</b><span><code>POST /tenancies/{id}/end</code> as soon as notice is given, anywhere from around 60 days to more than five days before move-out. Muuvo won't hold the outgoing tenancy yet, so create the landlord, property and tenancy first, then call <code>/end</code>.</span></div></li>
         <li><span class="t-when">−5 days</span><span class="t-dot amber"></span><div class="t-what"><b>Void switch processed</b><span>Muuvo releases the property to British Gas, our void partner, so the supply goes live in the landlord's name.</span></div></li>
         <li><span class="t-when">Move-out</span><span class="t-dot amber"></span><div class="t-what"><b>Bill credit and zero standing charge added</b><span>From move-out day the landlord gets a zero standing charge and a £30 bill credit.</span></div></li>
@@ -440,6 +423,7 @@ mark { background: var(--mark); color: inherit; border-radius: 2px; }
         <li><span class="t-when">Target +5 days</span><span class="t-dot"></span><div class="t-what"><b>Send the move-in readings</b><span><code>POST /tenancies/{id}/start</code> ideally within five days of move-in. The longer readings wait, the more likely billing issues become.</span></div></li>
         <li><span class="t-when">Next notice</span><span class="t-dot amber"></span><div class="t-what"><b>The cycle continues</b><span>When these tenants give notice, the journey starts again with the next end of tenancy.</span></div></li>
       </ol>
+      <div class="note"><strong>Starting with a new tenancy</strong><p>You can also join at a new tenancy, when references are passed. It works, but without the outgoing tenancy's notice the void period before it isn't covered, so start at notice given wherever you can.</p></div>
       <div class="note"><strong>Order doesn't matter</strong><p>An end of tenancy can reach Muuvo before the new tenancy at the same property, or the other way round. Send each piece of data as soon as you have it for the next change of occupancy, and we match them up.</p></div>
     </section>
 
@@ -457,6 +441,24 @@ mark { background: var(--mark); color: inherit; border-radius: 2px; }
           </tbody>
         </table>
       </div>
+    </section>
+
+    <!-- Void -->
+    <section id="void">
+      <div class="sec-head"><h2>The void service</h2><span class="sec-label">Service</span></div>
+      <p>Between tenancies, the landlord is usually liable for the bills. The void service takes the cost out of that gap. It only works if we know about the move-out early, which is why we ask for the end of tenancy as soon as notice is given.</p>
+      <div class="void-track" role="img" aria-label="Five days before move-out the property is released to British Gas. For 30 days from move-out the landlord gets a zero standing charge and a £30 bill credit.">
+        <div class="vt-seg vt-pre"><b>5 days before</b>Released to British Gas</div>
+        <div class="vt-mark"><span>Move-out</span></div>
+        <div class="vt-seg vt-post"><b>30 days after</b>Zero standing charge and a £30 bill credit for the landlord</div>
+      </div>
+      <ul>
+        <li>Five days before move-out, we release the property to British Gas, our void partner, so the supply goes live in the landlord's name.</li>
+        <li>From move-out day, the landlord gets a zero standing charge for 30 days and a £30 bill credit.</li>
+        <li>Send the move-out data more than five days before move-out. Most partners send it around 60 days ahead, as soon as notice is given.</li>
+        <li>Void bills under £30 and under 30 days are zeroed. This saves landlords and agents a lot of money, and commission is available on every switch.</li>
+        <li>We don't switch properties that don't qualify, for example where a new tenancy has already started or is about to.</li>
+      </ul>
     </section>
 
     <!-- Onboarding -->
@@ -505,16 +507,17 @@ mark { background: var(--mark); color: inherit; border-radius: 2px; }
     <!-- Build -->
     <section id="build">
       <div class="sec-head"><h2>Building a tenancy</h2><span class="sec-label">Workflow</span></div>
-      <p>Records build on each other. Create them in this order and keep each returned ID for the next step.</p>
+      <p>Start with the outgoing tenancy when notice is given, then follow on with the next tenancy. Records build on each other, so keep each returned ID for the next step.</p>
       <ol class="steps">
         <li><div><b>Landlord</b><span><code>POST /landlords</code> returns the landlord ID.</span></div></li>
         <li><div><b>Property</b><span><code>POST /properties</code> with the <code>landlordId</code> and the property address. Returns the property ID, and we start matching meters and council straight away.</span></div></li>
-        <li><div><b>Pre-tenancy</b><span><code>POST /tenancies</code> with the <code>propertyId</code>, dates and service options. Returns the tenancy ID.</span></div></li>
-        <li><div><b>Tenants</b><span><code>POST /tenancies/{tenancyId}/tenants</code> once for each tenant.</span></div></li>
-        <li><div><b>Start</b><span><code>POST /tenancies/{tenancyId}/start</code> with the move-in readings.</span></div></li>
-        <li><div><b>End</b><span><code>POST /tenancies/{tenancyId}/end</code> when notice is given, then again at move-out with closing readings.</span></div></li>
+        <li><div><b>Outgoing tenancy</b><span><code>POST /tenancies</code> with the <code>propertyId</code>, the current tenancy's dates and service options. Returns the tenancy ID.</span></div></li>
+        <li><div><b>Outgoing tenants</b><span><code>POST /tenancies/{tenancyId}/tenants</code> once for each tenant.</span></div></li>
+        <li><div><b>Notice given</b><span><code>POST /tenancies/{tenancyId}/end</code> as soon as notice is given, more than five days before move-out.</span></div></li>
+        <li><div><b>Move-out</b><span><code>POST /tenancies/{tenancyId}/end</code> again with the closing readings and the forwarding address.</span></div></li>
+        <li><div><b>Next tenancy</b><span>When the new tenants' references are passed, <code>POST /tenancies</code> for the same property, add the tenants, then <code>POST /tenancies/{tenancyId}/start</code> with the move-in readings.</span></div></li>
       </ol>
-      <div class="note"><strong>Starting from notice given</strong><p>When the journey starts at notice given, Muuvo won't hold the outgoing tenancy. Create the landlord, property and outgoing tenancy (steps 1 to 4), then go straight to step 6.</p></div>
+      <div class="note"><strong>Starting with a new tenancy</strong><p>If you only have a new tenancy, use steps 1 to 4 for it, then send the move-in readings with <code>/start</code>. Notice given is preferred, because the void period is only covered when Muuvo has the outgoing tenancy.</p></div>
 
       <h3>Endpoint reference</h3>
       <p>Every endpoint available to integration partners, grouped by record. Select one to see its fields, an example request in your language, the possible responses and an example response. Code examples use staging; switch the base URL to production once you have production keys.</p>
@@ -528,7 +531,7 @@ mark { background: var(--mark); color: inherit; border-radius: 2px; }
         <form class="tool-form" id="pb-form" autocomplete="off">
           <div class="row2">
             <label for="pb-property">Property ID<input id="pb-property" type="number" min="0" placeholder="0"></label>
-            <label for="pb-address">Void bills go to<select id="pb-address"><option>Property Agent Address</option><option>Landlord Address</option></select></label>
+            <label for="pb-address">Void bills go to<select id="pb-address"><option>Property Agent</option><option>Landlord</option></select></label>
           </div>
           <div class="row2">
             <label for="pb-start">Tenancy start<input id="pb-start" type="date"></label>
@@ -586,8 +589,8 @@ mark { background: var(--mark); color: inherit; border-radius: 2px; }
           <h4>voidBillCorrespondenceAddress</h4>
           <p>Where void-period bills are sent.</p>
           <div class="vals">
-            <div><span class="pill">Property Agent Address</span><span>The agency's correspondence address from its company profile</span></div>
-            <div><span class="pill">Landlord Address</span><span>The landlord's correspondence address</span></div>
+            <div><span class="pill">Property Agent</span><span>The agency's correspondence address from its company profile</span></div>
+            <div><span class="pill">Landlord</span><span>The landlord's correspondence address</span></div>
           </div>
         </article>
         <article class="field">
@@ -637,10 +640,10 @@ mark { background: var(--mark); color: inherit; border-radius: 2px; }
         <table>
           <thead><tr><th>Stage</th><th>Call</th><th>Send it</th><th>What happens</th></tr></thead>
           <tbody>
-            <tr><td><b>Pre-tenancy</b></td><td><code>POST /tenancies</code></td><td>As soon as references are passed</td><td>Queued until the right time to notify and pitch services</td></tr>
-            <tr><td><b>Move-in readings</b></td><td><code>POST /tenancies/{id}/start</code></td><td>Once the check-in inventory is done. Target: within 5 days of move-in</td><td>Opening readings recorded for council and suppliers</td></tr>
             <tr><td><b>Notice</b></td><td><code>POST /tenancies/{id}/end</code></td><td>As soon as notice is given, and more than 5 days before move-out (most arrive around 60 days ahead)</td><td>Void switch queued</td></tr>
             <tr><td><b>Move-out readings</b></td><td><code>POST /tenancies/{id}/end</code></td><td>On move-out, with readings and forwarding address</td><td>Closing readings and forwarding address recorded</td></tr>
+            <tr><td><b>Next tenancy</b></td><td><code>POST /tenancies</code></td><td>As soon as the new tenants' references are passed</td><td>Queued until the right time to notify and pitch services</td></tr>
+            <tr><td><b>Move-in readings</b></td><td><code>POST /tenancies/{id}/start</code></td><td>Once the check-in inventory is done. Target: within 5 days of move-in</td><td>Opening readings recorded for council and suppliers</td></tr>
           </tbody>
         </table>
       </div>
@@ -649,13 +652,13 @@ mark { background: var(--mark); color: inherit; border-radius: 2px; }
 
     <section id="planner">
       <div class="sec-head"><h2>Plan your calls</h2><span class="sec-label">Tool</span></div>
-      <p>Enter the dates for a tenancy to see when each call is due and when the void switch is released.</p>
+      <p>Enter the dates for a tenancy that's ending to see when each call is due, when the void switch is released and how much of the void period is covered. Add the next tenants' dates if you have them.</p>
       <div class="tool">
         <form class="tool-form" id="tp-form" autocomplete="off">
-          <label for="tp-refs">References passed<input id="tp-refs" type="date" value="2026-11-10"></label>
-          <label for="tp-movein">Move-in<input id="tp-movein" type="date" value="2026-12-01"></label>
-          <label for="tp-notice">Notice given <small>(optional)</small><input id="tp-notice" type="date" value="2027-09-01"></label>
-          <label for="tp-moveout">Move-out<input id="tp-moveout" type="date" value="2027-10-31"></label>
+          <label for="tp-notice">Notice given<input id="tp-notice" type="date" value="2027-01-04"></label>
+          <label for="tp-moveout">Move-out<input id="tp-moveout" type="date" value="2027-03-05"></label>
+          <label for="tp-refs">Next tenants' references passed <small>(optional)</small><input id="tp-refs" type="date" value="2027-02-15"></label>
+          <label for="tp-movein">Next tenants move in <small>(optional)</small><input id="tp-movein" type="date" value="2027-03-19"></label>
         </form>
         <div class="tool-out">
           <ol class="plan" id="tp-plan"></ol>
@@ -664,23 +667,6 @@ mark { background: var(--mark); color: inherit; border-radius: 2px; }
       </div>
     </section>
 
-    <!-- Void -->
-    <section id="void">
-      <div class="sec-head"><h2>The void service</h2><span class="sec-label">Service</span></div>
-      <p>Between tenancies, the landlord is usually liable for the bills. The void service takes the cost out of that gap. It only works if we know about the move-out early, which is why we ask for the end of tenancy as soon as notice is given.</p>
-      <div class="void-track" role="img" aria-label="Five days before move-out the property is released to British Gas. For 30 days from move-out the landlord gets a zero standing charge and a £30 bill credit.">
-        <div class="vt-seg vt-pre"><b>5 days before</b>Released to British Gas</div>
-        <div class="vt-mark"><span>Move-out</span></div>
-        <div class="vt-seg vt-post"><b>30 days after</b>Zero standing charge and a £30 bill credit for the landlord</div>
-      </div>
-      <ul>
-        <li>Five days before move-out, we release the property to British Gas, our void partner, so the supply goes live in the landlord's name.</li>
-        <li>From move-out day, the landlord gets a zero standing charge for 30 days and a £30 bill credit.</li>
-        <li>Send the move-out data more than five days before move-out. Most partners send it around 60 days ahead, as soon as notice is given.</li>
-        <li>Void bills under £30 and under 30 days are zeroed. This saves landlords and agents a lot of money, and commission is available on every switch.</li>
-        <li>We don't switch properties that don't qualify, for example where a new tenancy has already started or is about to.</li>
-      </ul>
-    </section>
 
     <!-- Utility -->
     <section id="utility">
@@ -742,16 +728,16 @@ mark { background: var(--mark); color: inherit; border-radius: 2px; }
       <ol class="steps">
         <li><div><b>Get a staging key</b><span>We issue a staging key and point you to the staging Swagger.</span></div></li>
         <li><div><b>Build and test on staging</b><span>Staging test data doesn't need cleaning up. Submit new data freely, or ask us to remove records.</span></div></li>
-        <li><div><b>Send real-shaped test data</b><span>A handful of new tenancies and end tenancies, as described below.</span></div></li>
+        <li><div><b>Send real-shaped test data</b><span>A handful of end tenancies and new tenancies, as described below.</span></div></li>
         <li><div><b>Sign-off</b><span>Muuvo checks the data is complete and the timings are right.</span></div></li>
         <li><div><b>Production</b><span>We issue production keys for each agency, for use with <code>https://agent.muuvo.co.uk/services</code>.</span></div></li>
       </ol>
       <h3>What we check before sign-off</h3>
       <ul class="check">
+        <li>End tenancies sent at notice, then again at move-out with closing readings and dates</li>
+        <li>Forwarding addresses on move-out</li>
         <li>New tenancies sent when references are passed, with tenants added</li>
         <li>Move-in readings with their reading dates</li>
-        <li>End tenancies sent at notice, then again with closing readings and dates</li>
-        <li>Forwarding addresses on move-out</li>
         <li>Liable parties and <code>voidBillCorrespondenceAddress</code> set correctly</li>
         <li>Service flags set as recommended in this guide</li>
       </ul>
@@ -842,15 +828,6 @@ mark { background: var(--mark); color: inherit; border-radius: 2px; }
   setTheme(document.documentElement.getAttribute('data-theme') || 'auto', false);
 
 
-  /* ---------- Journey start switch ---------- */
-  var journeyBtns = Array.prototype.slice.call(document.querySelectorAll('[data-journey-btn]'));
-  journeyBtns.forEach(function (b) {
-    b.addEventListener('click', function () {
-      var j = b.getAttribute('data-journey-btn');
-      journeyBtns.forEach(function (x) { x.setAttribute('aria-pressed', String(x === b)); });
-      document.querySelectorAll('ol[data-journey]').forEach(function (ol) { ol.hidden = ol.getAttribute('data-journey') !== j; });
-    });
-  });
 
   /* ---------- Copy buttons (delegated, so generated blocks work too) ---------- */
   document.addEventListener('click', function (e) {
@@ -1048,7 +1025,7 @@ mark { background: var(--mark); color: inherit; border-radius: 2px; }
     }
     lines.push(body.voidService ? ['on', 'Void switch to British Gas at move-out, if the property qualifies.'] : ['off', 'No void switch. Use this only when the landlord has asked to opt out.']);
     lines.push(['on', (body.whoIsResponsibleForTheVoidPeriod === 'Landlord' ? 'The landlord' : 'The letting agency') + ' is responsible for the void period.']);
-    lines.push(['on', 'Void bills are addressed to the ' + (body.voidBillCorrespondenceAddress === 'Landlord Address' ? 'landlord' : 'letting agency') + '.']);
+    lines.push(['on', 'Void bills are addressed to the ' + (body.voidBillCorrespondenceAddress === 'Landlord' ? 'landlord' : 'letting agency') + '.']);
     var s = parse($('pb-start').value), e = parse($('pb-end').value);
     if (s && e && e <= s) lines.push(['off', 'The tenancy end date is before the start date.']);
     $('pb-summary').innerHTML = lines.map(function (l) { return '<div><i class="' + (l[0] === 'off' ? 'off' : '') + '"></i><span>' + esc(l[1]) + '</span></div>'; }).join('');
@@ -1057,26 +1034,25 @@ mark { background: var(--mark); color: inherit; border-radius: 2px; }
 
   /* ---------- Timing planner ---------- */
   function plan() {
-    var refs = parse($('tp-refs').value), mi = parse($('tp-movein').value), notice = parse($('tp-notice').value), mo = parse($('tp-moveout').value);
+    var notice = parse($('tp-notice').value), mo = parse($('tp-moveout').value), refs = parse($('tp-refs').value), mi = parse($('tp-movein').value);
     var rows = [], flags = [];
-    if (refs) rows.push({ d: refs, k: 'api', t: 'Send the pre-tenancy', x: 'POST /tenancies' });
-    if (mi) {
-      rows.push({ d: mi, k: '', t: 'Tenants move in', x: 'Complete the check-in inventory and take meter readings' });
-      rows.push({ d: add(mi, 5), k: 'api', lbl: 'Target', t: 'Send the move-in readings', x: 'POST /tenancies/{id}/start, ideally by this date to avoid billing issues' });
-    }
     if (notice) rows.push({ d: notice, k: 'api', t: 'Send the end of tenancy', x: 'POST /tenancies/{id}/end, as soon as notice is given' });
     if (mo) {
       rows.push({ d: add(mo, -5), k: 'void', t: 'Void switch released', x: 'Muuvo releases the property to British Gas' });
       rows.push({ d: mo, k: 'api', t: 'Send closing readings', x: 'POST /tenancies/{id}/end again, with readings and forwarding address' });
-      rows.push({ d: add(mo, 30), k: 'void', lbl: 'Ends', t: '30-day void cover ends', x: 'Zero standing charge and the £30 bill credit cover the landlord from move-out to this date' });
+      rows.push({ d: mo, k: 'void', t: 'Void cover starts', x: 'Zero standing charge and a £30 bill credit for the landlord' });
+      rows.push({ d: add(mo, 30), k: 'void', lbl: 'At the latest', t: 'Void cover ends', x: 'The zero standing charge runs for up to 30 days from move-out' });
+    }
+    if (refs) rows.push({ d: refs, k: 'api', t: 'Send the next pre-tenancy', x: 'POST /tenancies for the new tenants' });
+    if (mi) {
+      rows.push({ d: mi, k: '', t: 'New tenants move in', x: 'Complete the check-in inventory and take meter readings' });
+      rows.push({ d: add(mi, 5), k: 'api', lbl: 'Target', t: 'Send the move-in readings', x: 'POST /tenancies/{id}/start, ideally by this date to avoid billing issues' });
     }
     rows.sort(function (a, b) { return a.d - b.d; });
     $('tp-plan').innerHTML = rows.map(function (r) {
       return '<li class="' + r.k + '"><span class="when">' + (r.lbl ? '<small>' + r.lbl + '</small>' : '') + fmt(r.d) + '</span><span class="what"><b>' + esc(r.t) + '</b>' + esc(r.x) + '</span></li>';
     }).join('');
 
-    if (refs && mi && refs > mi) flags.push(['amber', 'Check the dates', 'References are passed after the move-in date. Send the pre-tenancy as soon as possible.']);
-    if (mi && mo && mo <= mi) flags.push(['amber', 'Check the dates', 'Move-out is on or before move-in.']);
     if (notice && mo) {
       var lead = days(notice, mo);
       if (lead < 0) flags.push(['amber', 'Check the dates', 'Notice is dated after move-out.']);
@@ -1085,6 +1061,13 @@ mark { background: var(--mark); color: inherit; border-radius: 2px; }
     } else if (mo) {
       flags.push(['', 'Notice date', 'Add the date notice is given to check there is enough time for the void switch.']);
     }
+    if (mo && mi) {
+      var gap = days(mo, mi);
+      if (gap < 0) flags.push(['amber', 'Check the dates', 'The new tenants move in before the outgoing tenants move out.']);
+      else if (gap <= 30) flags.push(['teal', 'Void period covered', gap + ' days empty. The zero standing charge covers the whole void period.']);
+      else flags.push(['amber', 'Long void period', gap + ' days empty. The zero standing charge covers the first 30 days.']);
+    }
+    if (refs && mi && refs > mi) flags.push(['amber', 'Check the dates', "The new tenants' references are passed after their move-in date. Send the pre-tenancy as soon as possible."]);
     $('tp-flags').innerHTML = flags.map(function (f) { return '<div class="note ' + f[0] + '"><strong>' + esc(f[1]) + '</strong><p>' + esc(f[2]) + '</p></div>'; }).join('');
   }
   if ($('tp-form')) { $('tp-form').addEventListener('input', plan); $('tp-form').addEventListener('change', plan); $('tp-form').addEventListener('submit', function (e) { e.preventDefault(); }); plan(); }

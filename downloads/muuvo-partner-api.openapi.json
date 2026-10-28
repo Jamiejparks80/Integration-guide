@@ -352,7 +352,7 @@
           "Tenancies"
         ],
         "summary": "Create a pre-tenancy",
-        "description": "Send as soon as references are passed. Use the pre-tenancy builder on this page to generate this body.",
+        "description": "Use it for the outgoing tenancy when notice is given, and for each new tenancy once references are passed. The pre-tenancy builder on this page generates this body.",
         "operationId": "createAPretenancy",
         "responses": {
           "200": {
@@ -491,55 +491,6 @@
         ]
       }
     },
-    "/tenancies/{tenancyId}/start": {
-      "post": {
-        "tags": [
-          "Tenancies"
-        ],
-        "summary": "Send move-in readings",
-        "description": "Once the check-in inventory is done. Aim for within five days of move-in: the later the readings, the more likely billing issues become.",
-        "operationId": "sendMoveinReadings",
-        "responses": {
-          "200": {
-            "description": "Successful operation",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/APIResponse"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Invalid inputs"
-          },
-          "404": {
-            "description": "Invalid tenancy ID"
-          }
-        },
-        "parameters": [
-          {
-            "name": "tenancyId",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "integer",
-              "format": "int64"
-            }
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/TenancyStart"
-              }
-            }
-          }
-        }
-      }
-    },
     "/tenancies/{tenancyId}/end": {
       "post": {
         "tags": [
@@ -583,6 +534,55 @@
             "application/json": {
               "schema": {
                 "$ref": "#/components/schemas/TenancyEnd"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/tenancies/{tenancyId}/start": {
+      "post": {
+        "tags": [
+          "Tenancies"
+        ],
+        "summary": "Send move-in readings",
+        "description": "Once the check-in inventory is done. Aim for within five days of move-in: the later the readings, the more likely billing issues become.",
+        "operationId": "sendMoveinReadings",
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/APIResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid inputs"
+          },
+          "404": {
+            "description": "Invalid tenancy ID"
+          }
+        },
+        "parameters": [
+          {
+            "name": "tenancyId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TenancyStart"
               }
             }
           }
@@ -1507,10 +1507,10 @@
           "voidBillCorrespondenceAddress": {
             "type": "string",
             "enum": [
-              "Landlord Address",
-              "Property Agent Address"
+              "Landlord",
+              "Property Agent"
             ],
-            "description": "Landlord Address or Property Agent Address."
+            "description": "Who void bills are addressed to: Landlord or Property Agent."
           },
           "isFurnished": {
             "type": "boolean"
@@ -1609,10 +1609,10 @@
           "voidBillCorrespondenceAddress": {
             "type": "string",
             "enum": [
-              "Landlord Address",
-              "Property Agent Address"
+              "Landlord",
+              "Property Agent"
             ],
-            "description": "Landlord Address or Property Agent Address."
+            "description": "Who void bills are addressed to: Landlord or Property Agent."
           },
           "areAnyBillsIncludedInTheRent": {
             "type": "object",
@@ -1696,10 +1696,10 @@
           "voidBillCorrespondenceAddress": {
             "type": "string",
             "enum": [
-              "Landlord Address",
-              "Property Agent Address"
+              "Landlord",
+              "Property Agent"
             ],
-            "description": "Landlord Address or Property Agent Address."
+            "description": "Who void bills are addressed to: Landlord or Property Agent."
           },
           "areAnyBillsIncludedInTheRent": {
             "type": "object",
@@ -1971,10 +1971,10 @@
           "voidBillCorrespondenceAddress": {
             "type": "string",
             "enum": [
-              "Landlord Address",
-              "Property Agent Address"
+              "Landlord",
+              "Property Agent"
             ],
-            "description": "Landlord Address or Property Agent Address."
+            "description": "Who void bills are addressed to: Landlord or Property Agent."
           },
           "isFurnished": {
             "type": "boolean"

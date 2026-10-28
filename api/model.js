@@ -42,7 +42,7 @@
     gasMeterReadingDate: DATE, electricMeterReadingDate: DATE, waterMeterReadingDate: DATE,
     sendCouncilAndUtilityNotifications: 'true: Muuvo notifies the council and suppliers. false: the tenancy is treated as a tenant lead only.',
     whoIsResponsibleForTheVoidPeriod: 'Landlord or Property Agent.',
-    voidBillCorrespondenceAddress: 'Landlord Address or Property Agent Address.',
+    voidBillCorrespondenceAddress: 'Who void bills are addressed to: Landlord or Property Agent.',
     areAnyBillsIncludedInTheRent: 'Per utility. true means the bill is included in the rent, so Muuvo does not notify that council or supplier.',
     voidService: 'Opts the tenancy into the British Gas void service. Recommended: true.',
     meterReading2: 'Economy 7 meters only.', electricMeterReading_2: 'Economy 7 meters only.',
@@ -55,7 +55,7 @@
 
   var enums = {
     whoIsResponsibleForTheVoidPeriod: ['Landlord', 'Property Agent'],
-    voidBillCorrespondenceAddress: ['Landlord Address', 'Property Agent Address']
+    voidBillCorrespondenceAddress: ['Landlord', 'Property Agent']
   };
 
   var OK = { 200: 'Successful operation' };
@@ -77,12 +77,12 @@
     ] },
     { name: 'Tenancies', endpoints: [
       { m: 'GET', p: '/tenancies', d: 'List all tenancies', n: 'Returns a summary of every tenancy on your account.', res: ['Tenancy'], codes: codes({}) },
-      { m: 'POST', p: '/tenancies', d: 'Create a pre-tenancy', n: 'Send as soon as references are passed. Use the pre-tenancy builder on this page to generate this body.', req: 'PreTenancy', res: 'APIResponse', codes: codes(BAD) },
+      { m: 'POST', p: '/tenancies', d: 'Create a pre-tenancy', n: 'Use it for the outgoing tenancy when notice is given, and for each new tenancy once references are passed. The pre-tenancy builder on this page generates this body.', req: 'PreTenancy', res: 'APIResponse', codes: codes(BAD) },
       { m: 'GET', p: '/tenancies/{tenancyId}', d: 'Get the full tenancy', n: 'Returns the tenancy, meters with readings, and tenants.', res: 'TenancyCompleteInfo', codes: codes({ 404: 'Tenancy not found' }) },
       { m: 'PUT', p: '/tenancies/{tenancyId}', d: 'Update a tenancy', n: 'Use the stored tenancy ID for any change. Posting again would create a duplicate.', req: 'PreTenancy', res: 'APIResponse', codes: codes({ 400: 'Invalid inputs', 404: 'Invalid tenancy ID' }) },
       { m: 'DELETE', p: '/tenancies/{tenancyId}', d: 'Delete a tenancy', n: 'Removes the tenancy. Landlords and properties cannot be deleted through the API.', codes: { 400: 'Invalid ID supplied', 404: 'Tenancy not found' } },
-      { m: 'POST', p: '/tenancies/{tenancyId}/start', d: 'Send move-in readings', n: 'Once the check-in inventory is done. Aim for within five days of move-in: the later the readings, the more likely billing issues become.', req: 'TenancyStart', res: 'APIResponse', codes: codes({ 400: 'Invalid inputs', 404: 'Invalid tenancy ID' }) },
       { m: 'POST', p: '/tenancies/{tenancyId}/end', d: 'Give notice, then closing readings', n: 'Call it twice. First as soon as notice is given, when the readings and forwarding address can be left empty. Then again on move-out with the closing readings and the forwarding address.', req: 'TenancyEnd', res: 'APIResponse', codes: codes({ 400: 'Invalid inputs', 404: 'Invalid tenancy ID' }) },
+      { m: 'POST', p: '/tenancies/{tenancyId}/start', d: 'Send move-in readings', n: 'Once the check-in inventory is done. Aim for within five days of move-in: the later the readings, the more likely billing issues become.', req: 'TenancyStart', res: 'APIResponse', codes: codes({ 400: 'Invalid inputs', 404: 'Invalid tenancy ID' }) },
       { m: 'POST', p: '/updateForwardingAddress/{tenancyId}', d: 'Update the forwarding address', n: 'Use this if the forwarding address changes after the end of tenancy has been sent.', req: 'ForwardingAddress', res: 'APIResponse', codes: codes({ 400: 'Invalid inputs', 404: 'Invalid tenancy ID' }) }
     ] },
     { name: 'Tenants', endpoints: [
